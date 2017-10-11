@@ -5,5 +5,5 @@ The planner offers the following functionalities:
 - prioritization of tasks
 - creating one time or recurring events
 - 15 minutes, 10 minutes, “starting now” reminders for tasks.
-The planner will help you organize your time and your family.
+The planner will help you organize your time and your family's time.
 
