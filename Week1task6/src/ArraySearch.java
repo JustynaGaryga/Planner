@@ -26,8 +26,8 @@ public class ArraySearch {
 			System.out.println(number[foundValue2]);
 		}
 			else {
-				System.out.println("The value " + searchValue2 + " does not exist in the array");
-				}
+			System.out.println("The value " + searchValue2 + " does not exist in the array");
+			}
 	}
 }	
 		
