@@ -25,9 +25,9 @@ public class ArraySearch {
 		if (foundValue2 != -1 && foundValue2 < number.length) {
 			System.out.println(number[foundValue2]);
 		}
-			else {
+		else {
 			System.out.println("The value " + searchValue2 + " does not exist in the array");
-			}
+		}
 	}
 }	
 		
