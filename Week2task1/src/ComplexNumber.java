@@ -1,5 +1,10 @@
 
 public class ComplexNumber {
+
+	public ComplexNumber() {
+		// TODO Auto-generated constructor stub
+	}
+
 	Integer real;
 	Integer im;
 	/**
@@ -10,11 +15,6 @@ public class ComplexNumber {
 		super();
 		this.real = real;
 		this.im = im;
-	}
-
-	public ComplexNumber() {
-		// TODO Auto-generated constructor stub
-	
 	}
 	
 	public Integer getReal() {
@@ -60,19 +60,21 @@ public class ComplexNumber {
 		}
 		return false;
 	}
-		
-	public static void main(String[] ags) {
-		// TODO Auto-generated method stub
-		//my examples of complex numbers
-		ComplexNumber num1 = new ComplexNumber(5, 3);
-		ComplexNumber num2 = new ComplexNumber(6, 9); 
-		
-		System.out.println("Complex number 1: " + "(" + num1.real + ", " + num1.im + ")");
-		System.out.println("Complex number 2: " + "(" + num2.real + ", " + num2.im + ")");
-		System.out.println("Sum of complex numbers: " + sum(num1, num2).toString());
-		System.out.println("Product of complex numbers: " + product(num1, num2).toString());
-		System.out.println("Complex number 1= " + num1.toString());
-		System.out.println("Complex number 2= " + num2.toString());
-		System.out.println(equals(num1, num2));
+	
+	public void add(ComplexNumber num1) {
+		this.real = this.real + num1.real;
+		this.im = this.im + num1.im;
+	}
+	public void product(ComplexNumber num1) {
+		this.real = (num1.real*this.real - num1.im*this.im);
+		this.im = (num1.real*this.im + this.real*num1.im);
+	}
+	public boolean equals(ComplexNumber num1) {
+		if (num1.real == this.real) {
+			if (num1.im == this.im) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
