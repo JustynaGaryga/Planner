@@ -2,12 +2,17 @@ import javax.swing.JFrame;
 import javax.swing.JCheckBox;
 import javax.swing.JList;
 import javax.swing.JTextField;
+import javax.swing.JPanel;
 import java.awt.Choice;
 import java.awt.Scrollbar;
 import java.awt.GridLayout;
 
 public class GraphComponents extends JFrame {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	Choice days;
 	
 	public GraphComponents() {
@@ -16,11 +21,13 @@ public class GraphComponents extends JFrame {
 		setSize(600, 400);
 		setLocation(200, 200);
 		setLayout(new GridLayout(4, 4));
+		JPanel panel = new JPanel();
 		
 		// the checkboxes
-		add(new JCheckBox("One"));
-		add(new JCheckBox("Two"));
-		add(new JCheckBox("Three"));
+		panel.add(new JCheckBox("One"));
+		panel.add(new JCheckBox("Two"));
+		panel.add(new JCheckBox("Three"));
+		add(panel);
 		
 		// the list
 		String[] data = {"One", "Two", "Three"};
@@ -45,9 +52,5 @@ public class GraphComponents extends JFrame {
 		add(nameField);
 		
 		setVisible(true);
-	
 	}
-	
 }
-
-
