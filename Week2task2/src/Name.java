@@ -1,5 +1,4 @@
-
-public class Name {
+public class Name implements Comparable<Name> {
 	
 	String name;
 	String surname;
@@ -38,7 +37,7 @@ public class Name {
 	}
 	
 	// check if one Name object is equal to another Name object
-	public boolean equal(Name person1) {
+	public boolean equals(Name person1) {
 		if (person1.name.equals(this.name)) {
 			if (person1.surname.equals(this.surname)) {
 				return true;
@@ -49,16 +48,29 @@ public class Name {
 	
 	//
 	public int compareTo(Name person1) {
-		int diff = person1.name.compareTo(this.name);
+		int diff = this.name.compareTo(person1.name);
+		int diff2 = this.surname.compareTo(person1.surname);
 		if (diff == 0) {
-			System.out.println("Names are equals.");
-		}	else if (diff < 0) {
-			return 1;
-		} else if (diff > 0) { 
-			return -1;
+			if (diff2 == 0) {
+				return 0;
+			}
+		} else if (diff < 0) {
+				if (diff2 < 0 || diff2 ==0) {
+					return -1;
+				} 
+				if (diff2 > 0) {
+					return 1;
+				}
+		} else if (diff > 0) {
+			if (diff2 > 0 || diff2 == 0) {
+				return 1;
+			}
+			if (diff2 < 0) {
+				return -1;
+			}
 		}
-	
-	}
+		return 1;
+		}
 	
 	// 
 	public String toString() {
