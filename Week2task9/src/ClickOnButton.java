@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 public class ClickOnButton extends JFrame  implements ActionListener {
+	int numClicks = 0;
 	
 	public ClickOnButton() {
 		super( "Learn IT Girl" );
@@ -23,7 +24,6 @@ public class ClickOnButton extends JFrame  implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		// show a dialog with the message
-		int numClicks = 0;
 		numClicks++;
 		Frame frame = null;
 		JOptionPane.showMessageDialog(frame, "You have clicked the button " + numClicks + " times.");
