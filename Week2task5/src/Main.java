@@ -11,5 +11,8 @@ public class Main {
 		vector1.addElement("Justyna");
 		System.out.println(vector1.toString());
 		
+		vector1.insertElementAt("Friday", 3);
+		vector1.insertElementAt("Sunday", 4);
+		System.out.println(vector1.toString());
 	}
 }

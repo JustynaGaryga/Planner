@@ -9,15 +9,12 @@ public class SortedVector  extends Vector {
 		super();
 	}
 	public void addElement(String s) {
-		this.addElement(s);
+		super.addElement(s);
 		Collections.sort(this);
 	}
-		
 	public void insertElementAt(String s, int pos) {
-		this.insertElementAt(s, pos);
+		super.insertElementAt(s, pos);
 		Collections.sort(this);
 	}
-	
-	
 }
 
