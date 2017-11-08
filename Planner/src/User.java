@@ -5,6 +5,7 @@ import javax.swing.ListModel;
 public class User {
 	String name;
 	String surname;
+	ArrayList<User> assignet_to;
 	//public static ListModel<User> usersList;
 	
 	/**
