@@ -4,9 +4,11 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -20,7 +22,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
 public class Planner extends JFrame {
-	JFrame plannerFrame = new JFrame();
+	JFrame plannerFrame = new JFrame("Planner. Learn IT, Girl!");
 	JPanel listPanel = new JPanel();
 	JPanel topPanel = new JPanel();
 	JPanel buttonPanel = new JPanel();
@@ -30,8 +32,8 @@ public class Planner extends JFrame {
 	JLabel userLabel = new JLabel (" USERS: ", SwingConstants.LEFT);
 	JLabel taskLabel = new JLabel (" TASKS: ", SwingConstants.LEFT);
 	
-	DefaultListModel<User> usersList = new DefaultListModel<>();
-	DefaultListModel<Task> tasksList = new DefaultListModel<>();
+	DefaultComboBoxModel<User> usersList = new DefaultComboBoxModel<>();
+	DefaultComboBoxModel<Task> tasksList = new DefaultComboBoxModel<>();
 	JList listWithUsers = new JList(usersList);
 	JList listWithTasks = new JList(tasksList);
 	
@@ -72,14 +74,24 @@ public class Planner extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
+				JComboBox selectTask = new JComboBox(tasksList);
+				JComboBox assignedTo = new JComboBox(usersList);
+				JTextField start = new JTextField(30);
+			    JTextField end = new JTextField(30);
 				JTextField taskName = new JTextField(25);
-			    JTextField taskDescription = new JTextField(50);
+			    JTextField taskDescription = new JTextField(30);
 			    JPanel taskPanel = new JPanel();
 			    taskPanel.add(new JLabel("Name of task:"));
 			    taskPanel.add(taskName);
 			    taskPanel.add(Box.createVerticalStrut(15)); // a spacer
 			    taskPanel.add(new JLabel("Description of task:"));
 			    taskPanel.add(taskDescription);
+			    taskPanel.add(new JLabel("Choose the user:"));
+			    taskPanel.add(assignedTo);
+			    taskPanel.add(new JLabel("Start time. Enter dd/mm/yyyy hh:mm")); 
+			    taskPanel.add(start); // change to field where user can select the date and time
+			    taskPanel.add(new JLabel("End time. Enter dd/mm/yyyy hh:mm"));
+			    taskPanel.add(end); // change to field where user can select the date and time
 			    taskPanel.setLayout(new BoxLayout(taskPanel, BoxLayout.Y_AXIS));
 
 			    int result = JOptionPane.showConfirmDialog(null, taskPanel, 
@@ -88,37 +100,43 @@ public class Planner extends JFrame {
 			         System.out.println("Name of task: " + taskName.getText());
 			         System.out.println("Description of task: " + taskDescription.getText());
 			         Task newTask = new Task(taskName.getText(), taskDescription.getText());
+			         newTask.setStartTime(start.getText());
+			         newTask.setEndTime(end.getText());
+			         newTask.setAssignedTo((User)assignedTo.getSelectedItem());
+			         System.out.println("Start: " + newTask.getStartTime());
+			         System.out.println("End: " + newTask.getEndTime());
+			         System.out.println("Assigned to: " + newTask.getAssignedTo());
 			         tasksList.addElement(newTask);
+			       
 			    }}});
 		
+		// click on button
 		selectTaskButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				String[] selectTaskList = {"Wash clothes", "Shopping"}; // temporary list
-				String[] assignedToList = {"Justyna Garyga", "Piter Garyga"}; // temporary list
-				JComboBox selectTask = new JComboBox(selectTaskList);
-				JComboBox assignedTo = new JComboBox(assignedToList);
-				JTextField start = new JTextField(50);
-			    JTextField end = new JTextField(50);
+				JComboBox selectTask = new JComboBox(tasksList);
+				JComboBox assignedTo = new JComboBox(usersList);
+				JTextField start = new JTextField(30);
+			    JTextField end = new JTextField(30);
 			    JPanel selectPanel = new JPanel();
 			    selectPanel.add(new JLabel("Choose the task:"));
 			    selectPanel.add(selectTask);
 			    selectPanel.add(Box.createVerticalStrut(15)); // a spacer
 			    selectPanel.add(new JLabel("Choose the user:"));
 			    selectPanel.add(assignedTo);
-			    selectPanel.add(new JLabel("Start time: ")); 
+			    selectPanel.add(new JLabel("Start time. Enter dd/mm/yyyy hh:mm")); 
 			    selectPanel.add(start); // change to field where user can select the date and time
-			    selectPanel.add(new JLabel("End time: "));
+			    selectPanel.add(new JLabel("End time. Enter dd/mm/yyyy hh:mm"));
 			    selectPanel.add(end); // change to field where user can select the date and time
 			    selectPanel.setLayout(new BoxLayout(selectPanel, BoxLayout.Y_AXIS));
-
+			    
 			    int result = JOptionPane.showConfirmDialog(null, selectPanel, 
 			               "Choose the task and user", JOptionPane.OK_CANCEL_OPTION);
 			    if (result == JOptionPane.OK_OPTION) {
 			    
 			    }}});
-		
+				
 		//add buttons to panelButtons
 		buttonPanel.add(addUserButton);
 	    buttonPanel.add(addTaskButton);

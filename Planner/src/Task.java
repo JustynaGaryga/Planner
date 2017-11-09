@@ -1,14 +1,14 @@
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.text.DateFormat;
-import java.time.format.DateTimeFormatter;
-
 
 public class Task {
 	String nameTask;
 	String descriptionTask;
-	String startTask;
-	String endTask;
+	Date startTime;
+	Date endTime;
+	User assignedTo;
 	
 	/**
 	 * @param nameTask
@@ -35,26 +35,44 @@ public class Task {
 	public String toString() {
 		return nameTask;
 	}
-	public String getStartTask() {
-		return startTask;
+	public Date getStartTime() {
+		return startTime;
 	}
-	public void setStartTask(String startTask) {
-		this.startTask = startTask;
+	public void setStartTime(String startTime) {
+		Date startDate;
+		try {
+			startDate = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(startTime);
+			this.startTime = startDate;
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			this.startTime = null;
+		}
 	}
-	public String getEndTask() {
-		return endTask;
+	public Date getEndTime() {
+		return endTime;
 	}
-	public void setEndTask(String endTask) {
-		this.endTask = endTask;
+	public void setEndTime(String endTime) {
+		Date endDate;
+		try {
+			endDate = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(endTime);
+			this.endTime = endDate;
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			this.endTime = null;
+		}
 	}
-	
-	public void date() {
-	
-	/*
-	I should use: org.joda.time.format.DateTimeFormat;
-	DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss");
-	DateTime dt = formatter.parseDateTime(string);
-	*/
-
+	public void setStartTime(Date startTime) {
+		this.startTime = startTime;
+	}
+	public void setEndTime(Date endTime) {
+		this.endTime = endTime;
+	}
+	public User getAssignedTo() {
+		return assignedTo;
+	}
+	public void setAssignedTo(User assignedTo) {
+		this.assignedTo = assignedTo;
 	}
 }
