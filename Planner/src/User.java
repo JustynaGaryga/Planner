@@ -5,6 +5,7 @@ import javax.swing.ListModel;
 public class User {
 	String name;
 	String surname;
+	
 	//public static ListModel<User> usersList;
 	
 	/**
