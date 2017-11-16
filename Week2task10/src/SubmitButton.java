@@ -60,7 +60,7 @@ public class SubmitButton extends JFrame {
 	        		|| emailField.getText().length() == 0) {
 	        				submit.setEnabled(false);
 	        	} else {
-	        	submit.setEnabled(true);
+	        		submit.setEnabled(true);
 	        	}
 	        }
 		});
@@ -70,7 +70,7 @@ public class SubmitButton extends JFrame {
 		        		|| emailField.getText().length() == 0) {
 	        				submit.setEnabled(false);
 	        	} else {
-	        	submit.setEnabled(true);
+	        		submit.setEnabled(true);
 	        	}
 	        }
 		});
@@ -80,7 +80,7 @@ public class SubmitButton extends JFrame {
 		        		|| emailField.getText().length() == 0) {
 	        				submit.setEnabled(false);
 	        	} else {
-	        	submit.setEnabled(true);
+	        		submit.setEnabled(true);
 	        	}
 	        }
 		});
