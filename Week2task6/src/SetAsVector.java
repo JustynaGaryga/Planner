@@ -8,7 +8,7 @@ public class SetAsVector extends Vector {
 	}
 	public boolean contains(String s) {
 		if (super.contains(s)) {
-		return true;
+			return true;
 		}
 		return false;
 	}
@@ -17,12 +17,12 @@ public class SetAsVector extends Vector {
 			return false;
 		}
 		super.add(s);
-		return true;
+			return true;
 	}
 	public boolean remove(String s) {
 		if (super.contains(s)) {
 			super.remove(s);
 		}
-		return false;
+		return true;
 	}
 }
