@@ -22,7 +22,8 @@ public class SetAsVector extends Vector {
 	public boolean remove(String s) {
 		if (super.contains(s)) {
 			super.remove(s);
+			return true;
 		}
-		return true;
+		return false;
 	}
 }
