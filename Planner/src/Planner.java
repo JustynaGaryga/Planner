@@ -4,12 +4,10 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -17,12 +15,18 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 
 public class Planner extends JFrame {
 	JFrame plannerFrame = new JFrame("Planner. Learn IT, Girl!");
+	DefaultTableModel model;
 	JPanel listPanel = new JPanel();
 	JPanel topPanel = new JPanel();
 	JPanel buttonPanel = new JPanel();
@@ -191,5 +195,102 @@ public class Planner extends JFrame {
 		topPanel.add(selectTaskButton, BorderLayout.LINE_START);
 		plannerFrame.add(topPanel, BorderLayout.PAGE_START);
 		plannerFrame.add(listPanel, BorderLayout.LINE_START);
+		
+		//show a dialog for edit user, when we click on the user in User's list
+		listWithUsers.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent evtU) {
+				JTextField userName = new JTextField(25);
+			    JTextField userSurname = new JTextField(25);
+			    JPanel userPanel = new JPanel();
+			    JButton deleteUser = new JButton("Delete User");
+			    userPanel.add(new JLabel("Edit name:"));
+			    userPanel.add(userName);
+			    userPanel.add(Box.createVerticalStrut(15)); // a spacer
+			    userPanel.add(new JLabel("Edit surname:"));
+			    userPanel.add(userSurname);
+			    userPanel.add(deleteUser);
+			    userPanel.setLayout(new BoxLayout(userPanel, BoxLayout.Y_AXIS));
+				if (evtU.getValueIsAdjusting() == false) {
+					int result = JOptionPane.showConfirmDialog(null, userPanel, 
+				               "Edit the User", JOptionPane.OK_CANCEL_OPTION);
+					 if (result == JOptionPane.OK_OPTION) {
+				         System.out.println("Name: " + userName.getText());
+				         System.out.println("Surname: " + userSurname.getText());
+				         User editUser = (User)listWithUsers.getSelectedValue();
+				         editUser.setName(userName.getText());
+				         editUser.setSurname(userSurname.getText());
+					 
+				         deleteUser.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent arg0) {
+								int i = usersList.getIndexOf(editUser);
+							    usersList.removeElementAt(i);
+								}});
+					 }
+				}
+			}
+		});
+		
+		//show a dialog for edit task, when we click on the task
+		listWithTasks.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent evtT) {
+				JComboBox selectTask = new JComboBox(tasksList);
+				JComboBox assignedTo = new JComboBox(usersList);
+				JTextField start = new JTextField(30);
+			    JTextField end = new JTextField(30);
+				JTextField taskName = new JTextField(25);
+			    JTextField taskDescription = new JTextField(30);
+			    JButton deleteTask = new JButton("Delete the task");
+				JPanel taskPanel = new JPanel();
+			    taskPanel.add(new JLabel("Edit name of task:"));
+			    taskPanel.add(taskName);
+			    taskPanel.add(Box.createVerticalStrut(15)); // a spacer
+			    taskPanel.add(new JLabel("Edit description of task:"));
+			    taskPanel.add(taskDescription);
+			    taskPanel.add(new JLabel("Choose the user:"));
+			    taskPanel.add(assignedTo);
+			    taskPanel.add(new JLabel("Edit start time. Enter dd/mm/yyyy hh:mm")); 
+			    taskPanel.add(start); // change to field where user can select the date and time
+			    taskPanel.add(new JLabel("Edit end time. Enter dd/mm/yyyy hh:mm"));
+			    taskPanel.add(end); // change to field where user can select the date and time
+			    taskPanel.add(deleteTask);
+			    taskPanel.setLayout(new BoxLayout(taskPanel, BoxLayout.Y_AXIS));
+				if (evtT.getValueIsAdjusting() == false) {
+					 int result = JOptionPane.showConfirmDialog(null, taskPanel, 
+				               "Edit the task", JOptionPane.OK_CANCEL_OPTION);
+					 if (result == JOptionPane.OK_OPTION) {
+				         Task editTask = (Task)listWithTasks.getSelectedValue();
+				         editTask.setNameTask(taskName.getText());
+				         editTask.setDescriptionTask(taskDescription.getText());
+				         editTask.setStartTime(start.getText());
+				         editTask.setEndTime(end.getText());
+				         System.out.println("Name of task: " + taskName.getText());
+				         System.out.println("Description of task: " + taskDescription.getText());
+				         System.out.println("Start: " + editTask.getStartTime());
+				         System.out.println("End: " + editTask.getEndTime());
+				         System.out.println("Assigned to: " + editTask.getAssignedTo());
+				         
+				         deleteTask.addActionListener(new ActionListener() {
+								@Override
+								public void actionPerformed(ActionEvent arg0) {
+									int i = tasksList.getIndexOf(editTask);
+								    tasksList.removeElementAt(i);
+									}});
+					 }
+				}
+				System.out.println("Selected from " + evtT.getFirstIndex() + " to " + evtT.getLastIndex());
+			}
+		});	
+		
+		//JTable for calendar
+		String[] columnNames = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+		
+		model = new DefaultTableModel(null, columnNames);
+		JTable calendar = new JTable(model);
+		calendar.setRowHeight(70);
+		JScrollPane sp=new JScrollPane(calendar);
+		int rowCount = 5;
+		model.setRowCount(rowCount);
+		plannerFrame.add(sp);
 	}      
 }
