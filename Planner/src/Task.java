@@ -45,7 +45,6 @@ public class Task {
 			this.startTime = startDate;
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
 			this.startTime = null;
 		}
 	}
@@ -59,7 +58,6 @@ public class Task {
 			this.endTime = endDate;
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
 			this.endTime = null;
 		}
 	}
