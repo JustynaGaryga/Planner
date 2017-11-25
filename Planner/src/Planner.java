@@ -1,8 +1,14 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -15,22 +21,31 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 
 public class Planner extends JFrame {
 	JFrame plannerFrame = new JFrame("Planner. Learn IT, Girl!");
+	DefaultTableModel model;
+	Calendar cal = new GregorianCalendar(Locale.ENGLISH);
 	JPanel listPanel = new JPanel();
 	JPanel topPanel = new JPanel();
 	JPanel buttonPanel = new JPanel();
+	JPanel changeMonthPanel = new JPanel();
+	JPanel calPanel = new JPanel();
 	JButton addUserButton = new JButton("Add new User");
 	JButton addTaskButton = new JButton("Add new Task");
 	JButton selectTaskButton = new JButton("Choose new task");
 	JLabel userLabel = new JLabel (" USERS: ", SwingConstants.LEFT);
 	JLabel taskLabel = new JLabel (" TASKS: ", SwingConstants.LEFT);
+	JLabel monthLabel = new JLabel();
 	
 	DefaultComboBoxModel<User> usersList = new DefaultComboBoxModel<>();
 	DefaultComboBoxModel<Task> tasksList = new DefaultComboBoxModel<>();
@@ -40,8 +55,8 @@ public class Planner extends JFrame {
 	public Planner() {
 		super ("Planner. Learn IT, Girl!");
 		plannerFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		plannerFrame.setSize(800, 600);
-		plannerFrame.setLocation(200, 100);
+		plannerFrame.setSize(800, 500);
+		plannerFrame.setLocation(300, 50);
 		plannerFrame.getContentPane().setBackground(Color.yellow); // temporary color
 		plannerFrame.setVisible(true);
 		
@@ -137,7 +152,7 @@ public class Planner extends JFrame {
 			    
 			    }}});
 				
-		//add buttons to panelButtons
+		// add buttons to panelButtons
 		buttonPanel.add(addUserButton);
 	    buttonPanel.add(addTaskButton);
 	    buttonPanel.setSize(200, 200);
@@ -145,8 +160,8 @@ public class Planner extends JFrame {
 		
 		// User's list
 		User user1 = new User("Justyna", "Garyga");
-		User user2 = new User("Piter", "Garyga");
-		User user3 = new User("Kris", "Garyga");
+		User user2 = new User("Peter", "Garyga");
+		User user3 = new User("Chris", "Garyga");
 		User user4 = new User("Barbara", "Garyga");
 		
 		usersList.addElement(user1);
@@ -171,10 +186,11 @@ public class Planner extends JFrame {
 		tasksList.addElement(task6);
 		tasksList.addElement(task7);
 		
-		Border border = BorderFactory.createLineBorder(Color.BLACK);
+		Border border = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
 		userLabel.setBorder(border); 
 		taskLabel.setBorder(border);
 		
+		// the panel with list on the left side
 		listPanel.add(userLabel); 
 		listPanel.add(listWithUsers);
 		listPanel.add(Box.createRigidArea(new Dimension(0,20)));
@@ -182,23 +198,34 @@ public class Planner extends JFrame {
 		listPanel.add(listWithTasks);
 		listPanel.setBackground(Color.white);
 		listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
-		listPanel.setAlignmentY(LEFT_ALIGNMENT); // correct alignment to the left (labels!) 
 		
-		// layout
+		// the panel with buttons on the top
 		topPanel.setLayout(new BorderLayout());
 		topPanel.setBackground(Color.white);
 		topPanel.add(buttonPanel, BorderLayout.LINE_END);
 		topPanel.add(selectTaskButton, BorderLayout.LINE_START);
 		plannerFrame.add(topPanel, BorderLayout.PAGE_START);
-		plannerFrame.add(listPanel, BorderLayout.LINE_START);
+		plannerFrame.add(listPanel, BorderLayout.LINE_START); 
 		
-		//show a dialog for edit user, when we click on the user in User's list
+		// show a JFrame for edit user, when we click on the user in User's list
 		listWithUsers.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent evtU) {
+				//JFrame to edit User
+				JFrame editUserFrame = new JFrame("Edit the User");
+				editUserFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //clicking on X - close the Planner
+				editUserFrame.setSize(300, 200);
+				editUserFrame.setLocation(600, 200);
+				// the text field
 				JTextField userName = new JTextField(25);
-			    JTextField userSurname = new JTextField(25);
-			    JPanel userPanel = new JPanel();
+				JTextField userSurname = new JTextField(25);
+				JPanel userPanel = new JPanel();
+				JPanel okCancelPanel = new JPanel();
 			    JButton deleteUser = new JButton("Delete User");
+			    JButton okButton = new JButton("OK");
+			    JButton cancelButton = new JButton("Cancel");
+			    User editUser = (User)listWithUsers.getSelectedValue();
+			    //userName.setText(listWithUsers.getSelectedValue().toString());
+			    //userSurname.setText(listWithUsers.getSelectedValue().toString());
 			    userPanel.add(new JLabel("Edit name:"));
 			    userPanel.add(userName);
 			    userPanel.add(Box.createVerticalStrut(15)); // a spacer
@@ -206,38 +233,97 @@ public class Planner extends JFrame {
 			    userPanel.add(userSurname);
 			    userPanel.add(deleteUser);
 			    userPanel.setLayout(new BoxLayout(userPanel, BoxLayout.Y_AXIS));
+				okButton.setEnabled(false);
+				cancelButton.setEnabled(true);
+				okCancelPanel.add(okButton);
+				okCancelPanel.add(cancelButton);
+				okCancelPanel.setLayout(new FlowLayout());
+				userPanel.add(Box.createRigidArea(new Dimension(0,20)));
+				userPanel.setLayout(new BoxLayout(userPanel, BoxLayout.Y_AXIS));
+				
+				editUserFrame.add(userPanel, BorderLayout.CENTER);
+				editUserFrame.add(okCancelPanel, BorderLayout.PAGE_END);
+				
 				if (evtU.getValueIsAdjusting() == false) {
-					int result = JOptionPane.showConfirmDialog(null, userPanel, 
-				               "Edit the User", JOptionPane.OK_CANCEL_OPTION);
-					 if (result == JOptionPane.OK_OPTION) {
-				         System.out.println("Name: " + userName.getText());
-				         System.out.println("Surname: " + userSurname.getText());
-				         User editUser = (User)listWithUsers.getSelectedValue();
-				         editUser.setName(userName.getText());
-				         editUser.setSurname(userSurname.getText());
-					 
-				         deleteUser.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent arg0) {
-								int i = usersList.getIndexOf(editUser);
-							    usersList.removeElementAt(i);
-								}});
-					 }
+					editUserFrame.setVisible(true);
 				}
+				
+				//button OK become clickable when all the text fields have been completed
+				userName.addKeyListener(new KeyAdapter() {
+			        public void keyReleased(KeyEvent e) {
+			        	if (userName.getText().length() == 0 || userSurname.getText().length() == 0) {
+			        		okButton.setEnabled(false);
+			        	} else {
+			        		okButton.setEnabled(true);
+			        	}
+			        }
+				});
+				userSurname.addKeyListener(new KeyAdapter() {
+			        public void keyReleased(KeyEvent e) {
+			        	if (userName.getText().length() == 0 || userSurname.getText().length() == 0) {
+			        		okButton.setEnabled(false);
+			        	} else {
+			        		okButton.setEnabled(true);
+			        	}
+			        }
+				});
+				
+				// button Cancel close the frame to edit user
+				cancelButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						// TODO Auto-generated method stub
+						editUserFrame.dispose();
+					    }
+				});
+				
+				// button OK to save the changed user's name and/or surname
+				okButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						// TODO Auto-generated method stub
+						System.out.println("Name: " + userName.getText());
+					    System.out.println("Surname: " + userSurname.getText());
+					    editUser.setName(userName.getText());
+					    editUser.setSurname(userSurname.getText());
+					    editUserFrame.dispose();
+					    }
+				});
+				
+				// button to delete the user from the list of users
+			    deleteUser.addActionListener(new ActionListener() {
+			    	@Override
+					public void actionPerformed(ActionEvent arg0) {
+			    		int i = usersList.getIndexOf(editUser);
+			    		usersList.removeElementAt(i);
+			    		editUserFrame.dispose();
+			    	}
+				});
 			}
 		});
 		
-		//show a dialog for edit task, when we click on the task
+		// show a dialog for edit task, when we click on the task- to change it to JFrame!
 		listWithTasks.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent evtT) {
+				//JFrame to edit User
+				JFrame editTaskFrame = new JFrame("Edit the task");
+				editTaskFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE); //clicking on X - do nothing
+				editTaskFrame.setSize(300, 300);
+				editTaskFrame.setLocation(600, 200);
 				JComboBox selectTask = new JComboBox(tasksList);
 				JComboBox assignedTo = new JComboBox(usersList);
-				JTextField start = new JTextField(30);
-			    JTextField end = new JTextField(30);
 				JTextField taskName = new JTextField(25);
 			    JTextField taskDescription = new JTextField(30);
-			    JButton deleteTask = new JButton("Delete the task");
+			    JTextField start = new JTextField(30);
+			    JTextField end = new JTextField(30);
+			    JPanel okCancelPanel = new JPanel();
+			    JButton deleteTask = new JButton("Delete task");
+			    JButton okButton = new JButton("OK");
+			    JButton cancelButton = new JButton("Cancel");
+			    Task editTask = (Task)listWithTasks.getSelectedValue();
 				JPanel taskPanel = new JPanel();
+				//taskName.setText(listWithTasks.getSelectedValue().toString());
+			    //taskDescription.setText(listWithTasks.getSelectedValue().toString());
 			    taskPanel.add(new JLabel("Edit name of task:"));
 			    taskPanel.add(taskName);
 			    taskPanel.add(Box.createVerticalStrut(15)); // a spacer
@@ -250,32 +336,164 @@ public class Planner extends JFrame {
 			    taskPanel.add(new JLabel("Edit end time. Enter dd/mm/yyyy hh:mm"));
 			    taskPanel.add(end); // change to field where user can select the date and time
 			    taskPanel.add(deleteTask);
-			    taskPanel.setLayout(new BoxLayout(taskPanel, BoxLayout.Y_AXIS));
+			    okButton.setEnabled(false);
+				cancelButton.setEnabled(true);
+				okCancelPanel.add(okButton);
+				okCancelPanel.add(cancelButton);
+				okCancelPanel.setLayout(new FlowLayout());
+				taskPanel.add(Box.createRigidArea(new Dimension(0,20)));
+				taskPanel.setLayout(new BoxLayout(taskPanel, BoxLayout.Y_AXIS));
+				
+				editTaskFrame.add(taskPanel, BorderLayout.CENTER);
+				editTaskFrame.add(okCancelPanel, BorderLayout.PAGE_END);
+				
 				if (evtT.getValueIsAdjusting() == false) {
-					 int result = JOptionPane.showConfirmDialog(null, taskPanel, 
-				               "Edit the task", JOptionPane.OK_CANCEL_OPTION);
-					 if (result == JOptionPane.OK_OPTION) {
-				         Task editTask = (Task)listWithTasks.getSelectedValue();
-				         editTask.setNameTask(taskName.getText());
-				         editTask.setDescriptionTask(taskDescription.getText());
-				         editTask.setStartTime(start.getText());
-				         editTask.setEndTime(end.getText());
-				         System.out.println("Name of task: " + taskName.getText());
-				         System.out.println("Description of task: " + taskDescription.getText());
-				         System.out.println("Start: " + editTask.getStartTime());
-				         System.out.println("End: " + editTask.getEndTime());
-				         System.out.println("Assigned to: " + editTask.getAssignedTo());
-				         
-				         deleteTask.addActionListener(new ActionListener() {
-								@Override
-								public void actionPerformed(ActionEvent arg0) {
-									int i = tasksList.getIndexOf(editTask);
-								    tasksList.removeElementAt(i);
-									}});
-					 }
+					editTaskFrame.setVisible(true);
 				}
-				System.out.println("Selected from " + evtT.getFirstIndex() + " to " + evtT.getLastIndex());
+				//button OK become clickable when all the text fields have been completed
+				taskName.addKeyListener(new KeyAdapter() {
+			        public void keyReleased(KeyEvent e) {
+			        	if (taskName.getText().length() == 0 || taskDescription.getText().length() == 0
+			        			|| start.getText().length() == 0 || end.getText().length() == 0) {
+			        		okButton.setEnabled(false);
+			        	} else {
+			        		okButton.setEnabled(true);
+			        	}
+			        }
+				});
+				taskDescription.addKeyListener(new KeyAdapter() {
+			        public void keyReleased(KeyEvent e) {
+			        	if (taskName.getText().length() == 0 || taskDescription.getText().length() == 0
+			        			|| start.getText().length() == 0 || end.getText().length() == 0) {
+			        		okButton.setEnabled(false);
+			        	} else {
+			        		okButton.setEnabled(true);
+			        	}
+			        }
+				});
+				start.addKeyListener(new KeyAdapter() {
+			        public void keyReleased(KeyEvent e) {
+			        	if (taskName.getText().length() == 0 || taskDescription.getText().length() == 0
+			        			|| start.getText().length() == 0 || end.getText().length() == 0) {
+			        		okButton.setEnabled(false);
+			        	} else {
+			        		okButton.setEnabled(true);
+			        	}
+			        }
+				});
+				end.addKeyListener(new KeyAdapter() {
+			        public void keyReleased(KeyEvent e) {
+			        	if (taskName.getText().length() == 0 || taskDescription.getText().length() == 0
+			        			|| start.getText().length() == 0 || end.getText().length() == 0) {
+			        		okButton.setEnabled(false);
+			        	} else {
+			        		okButton.setEnabled(true);
+			        	}
+			        }
+				});
+				
+				// button Cancel close the frame to edit user
+				cancelButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						// TODO Auto-generated method stub
+						editTaskFrame.dispose();
+					}
+				});
+				
+				// button OK to save the changed user's name and/or surname
+				okButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						// TODO Auto-generated method stub
+						editTask.setNameTask(taskName.getText());
+						editTask.setDescriptionTask(taskDescription.getText());
+						editTask.setStartTime(start.getText());
+						editTask.setEndTime(end.getText());
+						System.out.println("Name of task: " + taskName.getText());
+						System.out.println("Description of task: " + taskDescription.getText());
+						System.out.println("Start: " + editTask.getStartTime());
+						System.out.println("End: " + editTask.getEndTime());
+						System.out.println("Assigned to: " + editTask.getAssignedTo());
+					    editTaskFrame.dispose();
+					    }
+				});
+				
+				// button to delete the user from the list of users
+			    deleteTask.addActionListener(new ActionListener() {
+			    	@Override
+					public void actionPerformed(ActionEvent arg0) {
+			    		int i = tasksList.getIndexOf(editTask);
+			    		tasksList.removeElementAt(i);
+			    		editTaskFrame.dispose();
+			    	}
+				});
+			    System.out.println("Selected from " + evtT.getFirstIndex() + " to " + evtT.getLastIndex());	 
 			}
 		});	
-	}      
+		
+		// JTable for calendar
+		String[] columnNames = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+		
+		model = new DefaultTableModel(null, columnNames);
+		JTable calendar = new JTable(model);
+		monthLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		calendar.setRowHeight(70);
+		calendar.setCellSelectionEnabled(true); // cells are clicable
+		calendar.setShowGrid(true); 
+		calendar.setGridColor(Color.LIGHT_GRAY);
+		JScrollPane sp=new JScrollPane(calendar);
+		int rowCount = 5;
+		model.setRowCount(rowCount);
+		
+		JButton buttonLow = new JButton("<-");
+			buttonLow.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent ae) {
+					cal.add(Calendar.MONTH, -1);
+					updateMonth();
+				}
+		    });
+			
+		JButton buttonHight = new JButton("->");
+			buttonHight.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent ae) {
+					cal.add(Calendar.MONTH, +1);
+					updateMonth();
+				}
+		    });
+		
+		// panel for changing the months and the calendar
+		changeMonthPanel.add(buttonLow, BorderLayout.WEST);
+		changeMonthPanel.add(monthLabel, BorderLayout.NORTH);
+		changeMonthPanel.add(buttonHight, BorderLayout.EAST);
+		changeMonthPanel.setBackground(Color.GREEN);
+		calPanel.add(changeMonthPanel);
+		calPanel.add(sp);
+		calPanel.setLayout(new BoxLayout(calPanel, BoxLayout.Y_AXIS));
+		plannerFrame.add(calPanel);
+		
+		this.updateMonth();
+	}
+	
+	//method to update month 
+	void updateMonth() {
+		cal.set(Calendar.DAY_OF_MONTH, 1);
+		     
+		String month = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.US);
+		int year = cal.get(Calendar.YEAR);
+		monthLabel.setText(month + " " + year);
+		     
+		int startDay = cal.get(Calendar.DAY_OF_WEEK);
+		int numberOfDays = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+		int weeks = cal.getActualMaximum(Calendar.WEEK_OF_MONTH);
+		
+		model.setRowCount(0);
+		model.setRowCount(weeks);
+		
+		int i = startDay-1;
+		for(int day=1;day<=numberOfDays;day++){
+			model.setValueAt(day, i/7 , i%7 );    
+			i = i + 1;
+		}
+	}     
 }
