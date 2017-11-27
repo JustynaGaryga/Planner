@@ -226,6 +226,7 @@ public class Planner extends JFrame {
 			    User editUser = (User)listWithUsers.getSelectedValue();
 			    //userName.setText(listWithUsers.getSelectedValue().toString());
 			    //userSurname.setText(listWithUsers.getSelectedValue().toString());
+
 			    userPanel.add(new JLabel("Edit name:"));
 			    userPanel.add(userName);
 			    userPanel.add(Box.createVerticalStrut(15)); // a spacer
@@ -233,6 +234,7 @@ public class Planner extends JFrame {
 			    userPanel.add(userSurname);
 			    userPanel.add(deleteUser);
 			    userPanel.setLayout(new BoxLayout(userPanel, BoxLayout.Y_AXIS));
+
 				okButton.setEnabled(false);
 				cancelButton.setEnabled(true);
 				okCancelPanel.add(okButton);
@@ -324,6 +326,7 @@ public class Planner extends JFrame {
 				JPanel taskPanel = new JPanel();
 				//taskName.setText(listWithTasks.getSelectedValue().toString());
 			    //taskDescription.setText(listWithTasks.getSelectedValue().toString());
+
 			    taskPanel.add(new JLabel("Edit name of task:"));
 			    taskPanel.add(taskName);
 			    taskPanel.add(Box.createVerticalStrut(15)); // a spacer
@@ -336,6 +339,7 @@ public class Planner extends JFrame {
 			    taskPanel.add(new JLabel("Edit end time. Enter dd/mm/yyyy hh:mm"));
 			    taskPanel.add(end); // change to field where user can select the date and time
 			    taskPanel.add(deleteTask);
+
 			    okButton.setEnabled(false);
 				cancelButton.setEnabled(true);
 				okCancelPanel.add(okButton);
@@ -406,6 +410,7 @@ public class Planner extends JFrame {
 					@Override
 					public void actionPerformed(ActionEvent arg0) {
 						// TODO Auto-generated method stub
+
 						editTask.setNameTask(taskName.getText());
 						editTask.setDescriptionTask(taskDescription.getText());
 						editTask.setStartTime(start.getText());
@@ -437,7 +442,8 @@ public class Planner extends JFrame {
 		
 		model = new DefaultTableModel(null, columnNames);
 		JTable calendar = new JTable(model);
-		monthLabel.setHorizontalAlignment(SwingConstants.CENTER);
+	    monthLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
 		calendar.setRowHeight(70);
 		calendar.setCellSelectionEnabled(true); // cells are clicable
 		calendar.setShowGrid(true); 
