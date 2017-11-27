@@ -212,7 +212,7 @@ public class Planner extends JFrame {
 			public void valueChanged(ListSelectionEvent evtU) {
 				//JFrame to edit User
 				JFrame editUserFrame = new JFrame("Edit the User");
-				editUserFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //clicking on X - close the Planner
+				editUserFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				editUserFrame.setSize(300, 200);
 				editUserFrame.setLocation(600, 200);
 				// the text field
@@ -224,8 +224,11 @@ public class Planner extends JFrame {
 			    JButton okButton = new JButton("OK");
 			    JButton cancelButton = new JButton("Cancel");
 			    User editUser = (User)listWithUsers.getSelectedValue();
-			    //userName.setText(listWithUsers.getSelectedValue().toString());
-			    //userSurname.setText(listWithUsers.getSelectedValue().toString());
+			    
+			    if (listWithUsers.getSelectedValue() != null) {
+		    		userName.setText(((User)listWithUsers.getSelectedValue()).getName());
+		    		userSurname.setText(((User)listWithUsers.getSelectedValue()).getSurname());
+			    }
 
 			    userPanel.add(new JLabel("Edit name:"));
 			    userPanel.add(userName);
@@ -246,27 +249,22 @@ public class Planner extends JFrame {
 				editUserFrame.add(userPanel, BorderLayout.CENTER);
 				editUserFrame.add(okCancelPanel, BorderLayout.PAGE_END);
 				
-				if (evtU.getValueIsAdjusting() == false) {
+				if (evtU.getValueIsAdjusting() == false && listWithUsers.getSelectedValue() != null) {
+					System.out.println("set it visible");
 					editUserFrame.setVisible(true);
 				}
 				
-				//button OK become clickable when all the text fields have been completed
+				// button OK is clicable, when all of the JTextFields are filled
+				enableOKButtonUser(userName, userSurname, okButton);
+				
 				userName.addKeyListener(new KeyAdapter() {
 			        public void keyReleased(KeyEvent e) {
-			        	if (userName.getText().length() == 0 || userSurname.getText().length() == 0) {
-			        		okButton.setEnabled(false);
-			        	} else {
-			        		okButton.setEnabled(true);
-			        	}
+			        	enableOKButtonUser(userName, userSurname, okButton);
 			        }
 				});
 				userSurname.addKeyListener(new KeyAdapter() {
 			        public void keyReleased(KeyEvent e) {
-			        	if (userName.getText().length() == 0 || userSurname.getText().length() == 0) {
-			        		okButton.setEnabled(false);
-			        	} else {
-			        		okButton.setEnabled(true);
-			        	}
+			        	enableOKButtonUser(userName, userSurname, okButton);
 			        }
 				});
 				
@@ -309,7 +307,7 @@ public class Planner extends JFrame {
 			public void valueChanged(ListSelectionEvent evtT) {
 				//JFrame to edit User
 				JFrame editTaskFrame = new JFrame("Edit the task");
-				editTaskFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE); //clicking on X - do nothing
+				editTaskFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); //clicking on X - do nothing
 				editTaskFrame.setSize(300, 300);
 				editTaskFrame.setLocation(600, 200);
 				JComboBox selectTask = new JComboBox(tasksList);
@@ -324,8 +322,11 @@ public class Planner extends JFrame {
 			    JButton cancelButton = new JButton("Cancel");
 			    Task editTask = (Task)listWithTasks.getSelectedValue();
 				JPanel taskPanel = new JPanel();
-				//taskName.setText(listWithTasks.getSelectedValue().toString());
-			    //taskDescription.setText(listWithTasks.getSelectedValue().toString());
+				
+				if (listWithTasks.getSelectedValue() != null) {
+		    		taskName.setText(((Task)listWithTasks.getSelectedValue()).getNameTask());
+		    		taskDescription.setText(((Task)listWithTasks.getSelectedValue()).getDescriptionTask());
+				}
 
 			    taskPanel.add(new JLabel("Edit name of task:"));
 			    taskPanel.add(taskName);
@@ -351,48 +352,31 @@ public class Planner extends JFrame {
 				editTaskFrame.add(taskPanel, BorderLayout.CENTER);
 				editTaskFrame.add(okCancelPanel, BorderLayout.PAGE_END);
 				
-				if (evtT.getValueIsAdjusting() == false) {
+				if (evtT.getValueIsAdjusting() == false && listWithTasks.getSelectedValue() != null) {
+					System.out.println("set it visible");
 					editTaskFrame.setVisible(true);
 				}
+				
 				//button OK become clickable when all the text fields have been completed
+				enableOKButtonTask(taskName, taskDescription, start, end, okButton);
 				taskName.addKeyListener(new KeyAdapter() {
 			        public void keyReleased(KeyEvent e) {
-			        	if (taskName.getText().length() == 0 || taskDescription.getText().length() == 0
-			        			|| start.getText().length() == 0 || end.getText().length() == 0) {
-			        		okButton.setEnabled(false);
-			        	} else {
-			        		okButton.setEnabled(true);
-			        	}
+			        	enableOKButtonTask(taskName, taskDescription, start, end, okButton);
 			        }
 				});
 				taskDescription.addKeyListener(new KeyAdapter() {
 			        public void keyReleased(KeyEvent e) {
-			        	if (taskName.getText().length() == 0 || taskDescription.getText().length() == 0
-			        			|| start.getText().length() == 0 || end.getText().length() == 0) {
-			        		okButton.setEnabled(false);
-			        	} else {
-			        		okButton.setEnabled(true);
-			        	}
+			        	enableOKButtonTask(taskName, taskDescription, start, end, okButton);
 			        }
 				});
 				start.addKeyListener(new KeyAdapter() {
 			        public void keyReleased(KeyEvent e) {
-			        	if (taskName.getText().length() == 0 || taskDescription.getText().length() == 0
-			        			|| start.getText().length() == 0 || end.getText().length() == 0) {
-			        		okButton.setEnabled(false);
-			        	} else {
-			        		okButton.setEnabled(true);
-			        	}
+			        	enableOKButtonTask(taskName, taskDescription, start, end, okButton);
 			        }
 				});
 				end.addKeyListener(new KeyAdapter() {
 			        public void keyReleased(KeyEvent e) {
-			        	if (taskName.getText().length() == 0 || taskDescription.getText().length() == 0
-			        			|| start.getText().length() == 0 || end.getText().length() == 0) {
-			        		okButton.setEnabled(false);
-			        	} else {
-			        		okButton.setEnabled(true);
-			        	}
+			        	enableOKButtonTask(taskName, taskDescription, start, end, okButton);
 			        }
 				});
 				
@@ -502,4 +486,23 @@ public class Planner extends JFrame {
 			i = i + 1;
 		}
 	}     
+	
+	// method to set the OK button enabled- JFrame to edit users
+	void enableOKButtonUser (JTextField userName, JTextField userSurname, JButton okButton) {
+		if (userName.getText().length() == 0 || userSurname.getText().length() == 0) {
+			okButton.setEnabled(false);
+		} else {
+			okButton.setEnabled(true);
+		}
+	}
+	
+	// method to set the OK button enabled- JFrame to edit tasks
+	void enableOKButtonTask (JTextField taskName, JTextField taskDescription, JTextField start, JTextField end, JButton okButton) {
+		if (taskName.getText().length() == 0 || taskDescription.getText().length() == 0
+    			|| start.getText().length() == 0 || end.getText().length() == 0) {
+    		okButton.setEnabled(false);
+    	} else {
+    		okButton.setEnabled(true);
+    	}
+	}
 }
