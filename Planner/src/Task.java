@@ -9,6 +9,7 @@ public class Task {
 	Date startTime;
 	Date endTime;
 	User assignedTo;
+	int taskID;
 	
 	/**
 	 * @param nameTask
@@ -72,5 +73,11 @@ public class Task {
 	}
 	public void setAssignedTo(User assignedTo) {
 		this.assignedTo = assignedTo;
+	}
+	public int getTaskID() {
+		return taskID;
+	}
+	public void setTaskID(int taskID) {
+		this.taskID = taskID;
 	}
 }

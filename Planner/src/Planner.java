@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
@@ -158,7 +159,7 @@ public class Planner extends JFrame {
 	    buttonPanel.setSize(200, 200);
 	    buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
 		
-		// User's list
+		/*User's list
 		User user1 = new User("Justyna", "Garyga");
 		User user2 = new User("Peter", "Garyga");
 		User user3 = new User("Chris", "Garyga");
@@ -168,8 +169,16 @@ public class Planner extends JFrame {
 		usersList.addElement(user2);
 		usersList.addElement(user3);
 		usersList.addElement(user4);
+		/*/ 
+	    // Users that want to use the application and don't have a database yet can use this code to have a working version
 		
-		// Task's list
+	    ArrayList<User> users = UserDAO.getUsers();
+		for (User u : users) {
+			usersList.addElement(u);
+		}
+		System.out.println(users.toString());
+		
+	    /* Task's list
 		Task task1 = new Task("Wash clothes", "washing clothes");
 		Task task2 = new Task("Shopping", "buying food and ");
 		Task task3 = new Task("Wash a car", "go to a car wash ");
@@ -185,6 +194,14 @@ public class Planner extends JFrame {
 		tasksList.addElement(task5);
 		tasksList.addElement(task6);
 		tasksList.addElement(task7);
+		*/
+		// Tasks that want to use the application and don't have a database yet can use this code to have a working version
+		
+		ArrayList<Task> tasks = TaskDAO.getTasks();
+		for (Task t : tasks) {
+			tasksList.addElement(t);
+		}
+		System.out.println(tasks.toString());
 		
 		Border border = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
 		userLabel.setBorder(border); 
@@ -286,6 +303,11 @@ public class Planner extends JFrame {
 					    System.out.println("Surname: " + userSurname.getText());
 					    editUser.setName(userName.getText());
 					    editUser.setSurname(userSurname.getText());
+					    User u = UserDAO.updateUser(editUser);
+					    if (u != null) {
+					    	editUser.setName(u.getName());
+						    editUser.setSurname(u.getSurname());
+					    }
 					    editUserFrame.dispose();
 					    }
 				});
@@ -295,7 +317,10 @@ public class Planner extends JFrame {
 			    	@Override
 					public void actionPerformed(ActionEvent arg0) {
 			    		int i = usersList.getIndexOf(editUser);
-			    		usersList.removeElementAt(i);
+			    		boolean result = UserDAO.deleteUser(editUser); 
+			    		if (result == true) {
+			    			usersList.removeElementAt(i);
+			    		}
 			    		editUserFrame.dispose();
 			    	}
 				});
@@ -404,6 +429,14 @@ public class Planner extends JFrame {
 						System.out.println("Start: " + editTask.getStartTime());
 						System.out.println("End: " + editTask.getEndTime());
 						System.out.println("Assigned to: " + editTask.getAssignedTo());
+						Task t = TaskDAO.updateTask(editTask);
+						    if (t != null) {
+						    	editTask.setNameTask(t.getNameTask());
+							    editTask.setDescriptionTask(t.getDescriptionTask());
+							    editTask.setStartTime(t.getStartTime());
+							    editTask.setEndTime(t.getEndTime());
+							    editTask.setAssignedTo(t.getAssignedTo());
+						    }
 					    editTaskFrame.dispose();
 					    }
 				});
@@ -414,6 +447,10 @@ public class Planner extends JFrame {
 					public void actionPerformed(ActionEvent arg0) {
 			    		int i = tasksList.getIndexOf(editTask);
 			    		tasksList.removeElementAt(i);
+			    		boolean result = TaskDAO.deleteTask(editTask); 
+			    		if (result == true) {
+			    			tasksList.removeElementAt(i);
+			    		}
 			    		editTaskFrame.dispose();
 			    	}
 				});
