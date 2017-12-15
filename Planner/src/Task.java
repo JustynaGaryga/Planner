@@ -21,6 +21,16 @@ public class Task {
 		this.nameTask = nameTask;
 		this.descriptionTask = descriptionTask;
 	}
+	
+	public Task(String nameTask, String descriptionTask, Date startTime, Date endTime, User assignedTo, int taskID) {
+		super();
+		this.nameTask = nameTask;
+		this.descriptionTask = descriptionTask;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.assignedTo = assignedTo;
+		this.taskID = taskID;
+	}
 	public String getNameTask() {
 		return nameTask;
 	}

@@ -57,6 +57,7 @@ public class UserDAO {
 		      
 			// Step 3 & 4: Execute a SQL UPDATE via executeUpdate()
 			//   which returns an int indicating the number of rows affected.
+			System.out.println(u);
 			String strUpdate = "update users set firstName =' " + u.getName() + "', surname= '" + u.getSurname() + "' where ID=" + String.valueOf(u.getId());
 			System.out.println("The SQL query is: " + strUpdate);  // Echo for debugging
 			int countUpdated = stmt.executeUpdate(strUpdate);
@@ -80,6 +81,7 @@ public class UserDAO {
 	}
 	
 	static User insertUser(User u) {
+		User user = null;
 		try {
 			// Step 1: Allocate a database 'Connection' object
 			Connection conn = DriverManager.getConnection(
@@ -102,18 +104,15 @@ public class UserDAO {
 			System.out.println("The SQL query is: " + strSelect);  // Echo For debugging
 			ResultSet rset = stmt.executeQuery(strSelect);
 			while(rset.next()) {   // Move the cursor to the next row
-				/*
-				System.out.println(rset.getInt("id") + ", "
-						+ rset.getString("author") + ", "
-						+ rset.getString("title") + ", "
-						+ rset.getDouble("price") + ", "
-						+ rset.getInt("qty"));
-						*/
+				String name = rset.getString("firstName");
+	            String surname = rset.getString("surname");
+	            int id = rset.getInt("ID");
+	            user = new User(name, surname, id);
 		    }
 		} catch(SQLException ex) {
 			ex.printStackTrace();
 	} 
-		return u;
+		return user;
 	}
 	
 	static boolean deleteUser(User u) {

@@ -82,7 +82,8 @@ public class Planner extends JFrame {
 			         System.out.println("Name: " + userName.getText());
 			         System.out.println("Surname: " + userSurname.getText());
 			         User newUser = new User(userName.getText(), userSurname.getText());
-			         usersList.addElement(newUser);
+			         User userCreated = UserDAO.insertUser(newUser);
+			         usersList.addElement(userCreated);
 			    }}});
 		
 		// click on button
@@ -119,10 +120,11 @@ public class Planner extends JFrame {
 			         newTask.setStartTime(start.getText());
 			         newTask.setEndTime(end.getText());
 			         newTask.setAssignedTo((User)assignedTo.getSelectedItem());
+			         Task taskCreated = TaskDAO.insertTask(newTask);
 			         System.out.println("Start: " + newTask.getStartTime());
 			         System.out.println("End: " + newTask.getEndTime());
 			         System.out.println("Assigned to: " + newTask.getAssignedTo());
-			         tasksList.addElement(newTask);
+			         tasksList.addElement(taskCreated);
 			       
 			    }}});
 		
@@ -351,6 +353,8 @@ public class Planner extends JFrame {
 				if (listWithTasks.getSelectedValue() != null) {
 		    		taskName.setText(((Task)listWithTasks.getSelectedValue()).getNameTask());
 		    		taskDescription.setText(((Task)listWithTasks.getSelectedValue()).getDescriptionTask());
+		    		start.setText(((Task)listWithTasks.getSelectedValue()).getStartTime().toString());
+		    		end.setText(((Task)listWithTasks.getSelectedValue()).getEndTime().toString());
 				}
 
 			    taskPanel.add(new JLabel("Edit name of task:"));
@@ -446,7 +450,6 @@ public class Planner extends JFrame {
 			    	@Override
 					public void actionPerformed(ActionEvent arg0) {
 			    		int i = tasksList.getIndexOf(editTask);
-			    		tasksList.removeElementAt(i);
 			    		boolean result = TaskDAO.deleteTask(editTask); 
 			    		if (result == true) {
 			    			tasksList.removeElementAt(i);

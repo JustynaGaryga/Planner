@@ -3,6 +3,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -21,7 +23,7 @@ public class TaskDAO {
 			
 			// Step 3: Execute a SQL SELECT query, the query result
 			//  is returned in a 'ResultSet' object.
-			String strSelect = "select taskID, nameTask, descriptionTask, assigendTo, startTime, endTime from tasks";
+			String strSelect = "select taskID, nameTask, descriptionTask, assignedTo, startTime, endTime from tasks";
 			System.out.println("The SQL query is: " + strSelect); // Echo For debugging
 	        System.out.println();
 	 
@@ -32,13 +34,32 @@ public class TaskDAO {
 	        System.out.println("The records selected are:");
 	        int rowCount = 0;
 	        while(rset.next()) {   // Move the cursor to the next row, return false if no more row
-	            String nameTask = rset.getString("nameTask");
+	        	String nameTask = rset.getString("nameTask");
 	            String descriptionTask = rset.getString("descriptionTask");
-	            Date startTime = rset.getString("startTime");
-	            Date endTime = rset.getString("endTime");
-	            String assignedTo = rset.getString("assignedTo");
+	            Date startTime = null;
+	            Date endTime = null;
+	            try {
+	            	startTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(rset.getString("startTime"));
+	            	endTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(rset.getString("endTime"));
+	            } catch (ParseException e) {
+	            	System.out.println("ParseException date");
+	            }
+	            int assignedTo = rset.getInt("assignedTo");
 	            int taskID = rset.getInt("taskID");
-	            Task task = new Task(nameTask, descriptionTask, startTime, endTime, assignedTo, taskID);
+	            /*
+	            // Step 3 & 4: Issue a SELECT to check the UPDATE.
+				String selectUser = "select * from users" + " where ID=" + String.valueOf(assignedTo);
+				System.out.println("The SQL query is: " + strSelect);  // Echo for debugging
+				ResultSet rsetUser = stmt.executeQuery(selectUser);
+				User user = null;
+				while(rsetUser.next()) {   // Move the cursor to the next row
+					String name = rsetUser.getString("firstName");
+		            String surname = rsetUser.getString("surname");
+		            int id = rsetUser.getInt("ID");
+		            user = new User(name, surname, id);
+				}
+				*/
+	            Task task = new Task(nameTask, descriptionTask, startTime, endTime, null, taskID);
 	            tasks.add(task);
 	            System.out.println(nameTask + ", " + descriptionTask + ", " + startTime + ", " + endTime + ", " + assignedTo + ", " + taskID);
 	            ++rowCount;
@@ -66,20 +87,39 @@ public class TaskDAO {
 			System.out.println("The SQL query is: " + strUpdate);  // Echo for debugging
 			int countUpdated = stmt.executeUpdate(strUpdate);
 			System.out.println(countUpdated + " records affected.");
-		 
+			
 			// Step 3 & 4: Issue a SELECT to check the UPDATE.
 			String strSelect = "select * from tasks" + " where taskID=" + String.valueOf(t.getTaskID());
 			System.out.println("The SQL query is: " + strSelect);  // Echo for debugging
 			ResultSet rset = stmt.executeQuery(strSelect);
 			
 			while(rset.next()) {   // Move the cursor to the next row
-				String nameTask = rset.getString("firstName");
+				String nameTask = rset.getString("nameTask");
 	            String descriptionTask = rset.getString("descriptionTask");
-	            Date startTime = rset.getString("startTime");
-	            Date endTime = rset.getString("endTime");
-	            String assignedTo = rset.getString("assignedTo");
+	            Date startTime = null;
+	            Date endTime = null;
+	            try {
+	            	startTime = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(rset.getString("startTime"));
+	            	endTime = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(rset.getString("endTime"));
+	            } catch (ParseException e) {
+	            }
+	            int assignedTo = rset.getInt("assignedTo");
 	            int taskID = rset.getInt("taskID");
-	            task = new Task(nameTask, descriptionTask, startTime, endTime, assignedTo, taskID);
+	            
+	            /*
+	            // Step 3 & 4: Issue a SELECT to check the UPDATE.
+				String selectUser = "select * from users" + " where ID=" + String.valueOf(assignedTo);
+				System.out.println("The SQL query is: " + strSelect);  // Echo for debugging
+				ResultSet rsetUser = stmt.executeQuery(selectUser);
+				User user = null;
+				while(rsetUser.next()) {   // Move the cursor to the next row
+					String name = rsetUser.getString("firstName");
+		            String surname = rsetUser.getString("surname");
+		            int id = rsetUser.getInt("ID");
+		            user = new User(name, surname, id);
+				}
+				*/
+	            task = new Task(nameTask, descriptionTask, startTime, endTime, null, taskID);
 			}
 		} catch(SQLException ex) {
 			ex.printStackTrace();
@@ -88,6 +128,7 @@ public class TaskDAO {
 	}
 	
 	static Task insertTask(Task t) {
+		Task task = null;
 		try {
 			// Step 1: Allocate a database 'Connection' object
 			Connection conn = DriverManager.getConnection(
@@ -100,7 +141,7 @@ public class TaskDAO {
 			//   which returns an int indicating the number of rows affected.
 			// INSERT a record
 			String sqlInsert = "insert into tasks " // need a space
-					+ "values ('" + t.getNameTask() + "', '" + t.getDescriptionTask() + "', '" + t.getStartTime() + "', '" + t.getEndTime() +  "', '" + t.getAssignedTo() + "')";
+					+ "values ('" + t.getNameTask() + "', '" + t.getDescriptionTask() + "', '" + t.getStartTime() + "', '" + t.getEndTime() +  "', " + t.getAssignedTo().getId() + ")";
 			System.out.println("The SQL query is: " + sqlInsert);  // Echo for debugging
 			int countInserted = stmt.executeUpdate(sqlInsert);
 			System.out.println(countInserted + " records inserted.\n");
@@ -110,19 +151,37 @@ public class TaskDAO {
 			System.out.println("The SQL query is: " + strSelect);  // Echo For debugging
 			ResultSet rset = stmt.executeQuery(strSelect);
 			while(rset.next()) {   // Move the cursor to the next row
-				/*
-				System.out.println(rset.getInt("id") + ", "
-						+ rset.getString("author") + ", "
-						+ rset.getString("title") + ", "
-						+ rset.getDouble("price") + ", "
-						+ rset.getInt("qty"));
-						*/
-	
+				String nameTask = rset.getString("nameTask");
+	            String descriptionTask = rset.getString("descriptionTask");
+	            Date startTime = null;
+	            Date endTime = null;
+	            try {
+	            	startTime = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(rset.getString("startTime"));
+	            	endTime = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(rset.getString("endTime"));
+	            } catch (ParseException e) {
+	            }
+	            int assignedTo = rset.getInt("assignedTo");
+	            int taskID = rset.getInt("taskID");
+	            /*
+	            // Step 3 & 4: Issue a SELECT to check the UPDATE.
+				String selectUser = "select * from users" + " where ID=" + String.valueOf(assignedTo);
+				System.out.println("The SQL query is: " + strSelect);  // Echo for debugging
+				ResultSet rsetUser = stmt.executeQuery(selectUser);
+				User user = null;
+			
+				while(rsetUser.next()) {   // Move the cursor to the next row
+					String name = rsetUser.getString("firstName");
+		            String surname = rsetUser.getString("surname");
+		            int id = rsetUser.getInt("ID");
+		            user = new User(name, surname, id);
+				}
+				*/
+	            task = new Task(nameTask, descriptionTask, startTime, endTime, null, taskID);
 		    }
 		} catch(SQLException ex) {
 			ex.printStackTrace();
 	} 
-		return t;
+		return task;
 	}
 	
 	static boolean deleteTask(Task t) {
