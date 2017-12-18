@@ -52,7 +52,7 @@ public class Task {
 	public void setStartTime(String startTime) {
 		Date startDate;
 		try {
-			startDate = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(startTime);
+			startDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(startTime);
 			this.startTime = startDate;
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
@@ -65,7 +65,7 @@ public class Task {
 	public void setEndTime(String endTime) {
 		Date endDate;
 		try {
-			endDate = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(endTime);
+			endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(endTime);
 			this.endTime = endDate;
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block

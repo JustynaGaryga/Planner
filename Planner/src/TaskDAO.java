@@ -8,10 +8,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import javax.swing.DefaultComboBoxModel;
+
 public class TaskDAO {
 	
-	static ArrayList<Task> getTasks() {
+	static ArrayList<Task> getTasks(ArrayList<User> users) {
 		ArrayList<Task> tasks = new ArrayList<Task>();
+		
 		try {
 			// Step 1: Allocate a database 'Connection' object
 			Connection conn = DriverManager.getConnection(
@@ -71,7 +74,7 @@ public class TaskDAO {
 		return tasks;
 	}
 	
-	static Task updateTask(Task t) {
+	static Task updateTask(Task t, ArrayList<User> users) {
 		Task task = null;
 		try {
 			// Step 1: Allocate a database 'Connection' object
@@ -127,7 +130,7 @@ public class TaskDAO {
 		 return task;
 	}
 	
-	static Task insertTask(Task t) {
+	static Task insertTask(Task t, ArrayList<User> users) {
 		Task task = null;
 		try {
 			// Step 1: Allocate a database 'Connection' object

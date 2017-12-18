@@ -105,9 +105,9 @@ public class Planner extends JFrame {
 			    taskPanel.add(taskDescription);
 			    taskPanel.add(new JLabel("Choose the user:"));
 			    taskPanel.add(assignedTo);
-			    taskPanel.add(new JLabel("Start time. Enter dd/mm/yyyy hh:mm")); 
+			    taskPanel.add(new JLabel("Start time. Enter yyyy-MM-dd HH:mm:ss")); 
 			    taskPanel.add(start); // change to field where user can select the date and time
-			    taskPanel.add(new JLabel("End time. Enter dd/mm/yyyy hh:mm"));
+			    taskPanel.add(new JLabel("End time. Enter yyyy-MM-dd HH:mm:ss"));
 			    taskPanel.add(end); // change to field where user can select the date and time
 			    taskPanel.setLayout(new BoxLayout(taskPanel, BoxLayout.Y_AXIS));
 
@@ -120,7 +120,7 @@ public class Planner extends JFrame {
 			         newTask.setStartTime(start.getText());
 			         newTask.setEndTime(end.getText());
 			         newTask.setAssignedTo((User)assignedTo.getSelectedItem());
-			         Task taskCreated = TaskDAO.insertTask(newTask);
+			         Task taskCreated = TaskDAO.insertTask(newTask, null);
 			         System.out.println("Start: " + newTask.getStartTime());
 			         System.out.println("End: " + newTask.getEndTime());
 			         System.out.println("Assigned to: " + newTask.getAssignedTo());
@@ -143,9 +143,9 @@ public class Planner extends JFrame {
 			    selectPanel.add(Box.createVerticalStrut(15)); // a spacer
 			    selectPanel.add(new JLabel("Choose the user:"));
 			    selectPanel.add(assignedTo);
-			    selectPanel.add(new JLabel("Start time. Enter dd/mm/yyyy hh:mm")); 
+			    selectPanel.add(new JLabel("Start time. Enter yyyy-MM-dd HH:mm:ss")); 
 			    selectPanel.add(start); // change to field where user can select the date and time
-			    selectPanel.add(new JLabel("End time. Enter dd/mm/yyyy hh:mm"));
+			    selectPanel.add(new JLabel("End time. Enter yyyy-MM-dd HH:mm:ss"));
 			    selectPanel.add(end); // change to field where user can select the date and time
 			    selectPanel.setLayout(new BoxLayout(selectPanel, BoxLayout.Y_AXIS));
 			    
@@ -174,11 +174,14 @@ public class Planner extends JFrame {
 		/*/ 
 	    // Users that want to use the application and don't have a database yet can use this code to have a working version
 		
+	    
 	    ArrayList<User> users = UserDAO.getUsers();
 		for (User u : users) {
 			usersList.addElement(u);
 		}
 		System.out.println(users.toString());
+		
+		
 		
 	    /* Task's list
 		Task task1 = new Task("Wash clothes", "washing clothes");
@@ -199,7 +202,7 @@ public class Planner extends JFrame {
 		*/
 		// Tasks that want to use the application and don't have a database yet can use this code to have a working version
 		
-		ArrayList<Task> tasks = TaskDAO.getTasks();
+		ArrayList<Task> tasks = TaskDAO.getTasks(users);
 		for (Task t : tasks) {
 			tasksList.addElement(t);
 		}
@@ -364,9 +367,9 @@ public class Planner extends JFrame {
 			    taskPanel.add(taskDescription);
 			    taskPanel.add(new JLabel("Choose the user:"));
 			    taskPanel.add(assignedTo);
-			    taskPanel.add(new JLabel("Edit start time. Enter dd/mm/yyyy hh:mm")); 
+			    taskPanel.add(new JLabel("Edit start time. Enter yyyy-MM-dd HH:mm:ss")); 
 			    taskPanel.add(start); // change to field where user can select the date and time
-			    taskPanel.add(new JLabel("Edit end time. Enter dd/mm/yyyy hh:mm"));
+			    taskPanel.add(new JLabel("Edit end time. Enter yyyy-MM-dd HH:mm:ss"));
 			    taskPanel.add(end); // change to field where user can select the date and time
 			    taskPanel.add(deleteTask);
 
@@ -433,7 +436,7 @@ public class Planner extends JFrame {
 						System.out.println("Start: " + editTask.getStartTime());
 						System.out.println("End: " + editTask.getEndTime());
 						System.out.println("Assigned to: " + editTask.getAssignedTo());
-						Task t = TaskDAO.updateTask(editTask);
+						Task t = TaskDAO.updateTask(editTask, users);
 						    if (t != null) {
 						    	editTask.setNameTask(t.getNameTask());
 							    editTask.setDescriptionTask(t.getDescriptionTask());
