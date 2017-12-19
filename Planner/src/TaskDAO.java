@@ -49,20 +49,15 @@ public class TaskDAO {
 	            }
 	            int assignedTo = rset.getInt("assignedTo");
 	            int taskID = rset.getInt("taskID");
-	            /*
-	            // Step 3 & 4: Issue a SELECT to check the UPDATE.
-				String selectUser = "select * from users" + " where ID=" + String.valueOf(assignedTo);
-				System.out.println("The SQL query is: " + strSelect);  // Echo for debugging
-				ResultSet rsetUser = stmt.executeQuery(selectUser);
-				User user = null;
-				while(rsetUser.next()) {   // Move the cursor to the next row
-					String name = rsetUser.getString("firstName");
-		            String surname = rsetUser.getString("surname");
-		            int id = rsetUser.getInt("ID");
-		            user = new User(name, surname, id);
-				}
-				*/
-	            Task task = new Task(nameTask, descriptionTask, startTime, endTime, null, taskID);
+	            
+	            // you need to replace this commented code with a for loop in the users array. You need to search the user that has the id == assignedTo and put this user in the constructor at line 65 (56). Do the same thing for insert and update methods.
+	            for (User user : users) {
+	            	int selectedID = user.getId();
+	            	selectedID= assignedTo;
+	            	
+	    		}
+	            
+	            Task task = new Task(nameTask, descriptionTask, startTime, endTime, user, taskID);
 	            tasks.add(task);
 	            System.out.println(nameTask + ", " + descriptionTask + ", " + startTime + ", " + endTime + ", " + assignedTo + ", " + taskID);
 	            ++rowCount;
@@ -143,7 +138,7 @@ public class TaskDAO {
 			// Step 3: Execute a SQL INSERT statement via executeUpdate(),
 			//   which returns an int indicating the number of rows affected.
 			// INSERT a record
-			String sqlInsert = "insert into tasks " // need a space
+			String sqlInsert = "insert into tasks  (nameTask, descriptionTask, startTime, endTime, assignedTo) " // need a space
 					+ "values ('" + t.getNameTask() + "', '" + t.getDescriptionTask() + "', '" + t.getStartTime() + "', '" + t.getEndTime() +  "', " + t.getAssignedTo().getId() + ")";
 			System.out.println("The SQL query is: " + sqlInsert);  // Echo for debugging
 			int countInserted = stmt.executeUpdate(sqlInsert);

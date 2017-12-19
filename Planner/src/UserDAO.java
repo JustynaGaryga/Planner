@@ -93,7 +93,7 @@ public class UserDAO {
 			// Step 3: Execute a SQL INSERT statement via executeUpdate(),
 			//   which returns an int indicating the number of rows affected.
 			// INSERT a record
-			String sqlInsert = "insert into users " // need a space
+			String sqlInsert = "insert into users (firstName, surname) " // need a space
 					+ "values ('" + u.getName() + "', '" +u.getSurname() + "')";
 			System.out.println("The SQL query is: " + sqlInsert);  // Echo for debugging
 			int countInserted = stmt.executeUpdate(sqlInsert);

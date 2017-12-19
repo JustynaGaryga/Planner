@@ -61,6 +61,19 @@ public class Planner extends JFrame {
 		plannerFrame.getContentPane().setBackground(Color.yellow); // temporary color
 		plannerFrame.setVisible(true);
 		
+		// create the ArrayLists of users and tasks
+		ArrayList<User> users = UserDAO.getUsers();
+		for (User u : users) {
+			usersList.addElement(u);
+		}
+		System.out.println(users.toString());
+		
+		ArrayList<Task> tasks = TaskDAO.getTasks(users);
+		for (Task t : tasks) {
+			tasksList.addElement(t);
+		}
+		System.out.println(tasks.toString());
+		
 		//click on button 
 		addUserButton.addActionListener(new ActionListener() {
 			@Override
@@ -120,7 +133,7 @@ public class Planner extends JFrame {
 			         newTask.setStartTime(start.getText());
 			         newTask.setEndTime(end.getText());
 			         newTask.setAssignedTo((User)assignedTo.getSelectedItem());
-			         Task taskCreated = TaskDAO.insertTask(newTask, null);
+			         Task taskCreated = TaskDAO.insertTask(newTask, users);
 			         System.out.println("Start: " + newTask.getStartTime());
 			         System.out.println("End: " + newTask.getEndTime());
 			         System.out.println("Assigned to: " + newTask.getAssignedTo());
@@ -174,15 +187,6 @@ public class Planner extends JFrame {
 		/*/ 
 	    // Users that want to use the application and don't have a database yet can use this code to have a working version
 		
-	    
-	    ArrayList<User> users = UserDAO.getUsers();
-		for (User u : users) {
-			usersList.addElement(u);
-		}
-		System.out.println(users.toString());
-		
-		
-		
 	    /* Task's list
 		Task task1 = new Task("Wash clothes", "washing clothes");
 		Task task2 = new Task("Shopping", "buying food and ");
@@ -201,12 +205,6 @@ public class Planner extends JFrame {
 		tasksList.addElement(task7);
 		*/
 		// Tasks that want to use the application and don't have a database yet can use this code to have a working version
-		
-		ArrayList<Task> tasks = TaskDAO.getTasks(users);
-		for (Task t : tasks) {
-			tasksList.addElement(t);
-		}
-		System.out.println(tasks.toString());
 		
 		Border border = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
 		userLabel.setBorder(border); 
