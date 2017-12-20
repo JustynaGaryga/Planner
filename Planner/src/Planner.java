@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -354,8 +356,11 @@ public class Planner extends JFrame {
 				if (listWithTasks.getSelectedValue() != null) {
 		    		taskName.setText(((Task)listWithTasks.getSelectedValue()).getNameTask());
 		    		taskDescription.setText(((Task)listWithTasks.getSelectedValue()).getDescriptionTask());
-		    		start.setText(((Task)listWithTasks.getSelectedValue()).getStartTime().toString());
-		    		end.setText(((Task)listWithTasks.getSelectedValue()).getEndTime().toString());
+		    		Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+					String startFormatted = formatter.format(((Task)listWithTasks.getSelectedValue()).getStartTime());
+					String endFormatted = formatter.format(((Task)listWithTasks.getSelectedValue()).getEndTime());
+		    		start.setText(startFormatted);
+		    		end.setText(endFormatted);
 				}
 
 			    taskPanel.add(new JLabel("Edit name of task:"));

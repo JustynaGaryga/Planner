@@ -3,6 +3,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -50,14 +51,15 @@ public class TaskDAO {
 	            int assignedTo = rset.getInt("assignedTo");
 	            int taskID = rset.getInt("taskID");
 	            
-	            // you need to replace this commented code with a for loop in the users array. You need to search the user that has the id == assignedTo and put this user in the constructor at line 65 (56). Do the same thing for insert and update methods.
+	            User assignedUser = null;
 	            for (User user : users) {
 	            	int selectedID = user.getId();
-	            	selectedID= assignedTo;
-	            	
+	            	if (selectedID== assignedTo) {
+	            		 assignedUser = user;
+	            	     break;
+	            	}
 	    		}
-	            
-	            Task task = new Task(nameTask, descriptionTask, startTime, endTime, user, taskID);
+	            Task task = new Task(nameTask, descriptionTask, startTime, endTime, assignedUser, taskID);
 	            tasks.add(task);
 	            System.out.println(nameTask + ", " + descriptionTask + ", " + startTime + ", " + endTime + ", " + assignedTo + ", " + taskID);
 	            ++rowCount;
@@ -104,20 +106,15 @@ public class TaskDAO {
 	            int assignedTo = rset.getInt("assignedTo");
 	            int taskID = rset.getInt("taskID");
 	            
-	            /*
-	            // Step 3 & 4: Issue a SELECT to check the UPDATE.
-				String selectUser = "select * from users" + " where ID=" + String.valueOf(assignedTo);
-				System.out.println("The SQL query is: " + strSelect);  // Echo for debugging
-				ResultSet rsetUser = stmt.executeQuery(selectUser);
-				User user = null;
-				while(rsetUser.next()) {   // Move the cursor to the next row
-					String name = rsetUser.getString("firstName");
-		            String surname = rsetUser.getString("surname");
-		            int id = rsetUser.getInt("ID");
-		            user = new User(name, surname, id);
-				}
-				*/
-	            task = new Task(nameTask, descriptionTask, startTime, endTime, null, taskID);
+	            User assignedUser = null;
+	            for (User user : users) {
+	            	int selectedID = user.getId();
+	            	if (selectedID== assignedTo) {
+	            		 assignedUser = user;
+	            	     break;
+	            	}
+	    		}
+	            task = new Task(nameTask, descriptionTask, startTime, endTime, assignedUser, taskID);
 			}
 		} catch(SQLException ex) {
 			ex.printStackTrace();
@@ -138,14 +135,18 @@ public class TaskDAO {
 			// Step 3: Execute a SQL INSERT statement via executeUpdate(),
 			//   which returns an int indicating the number of rows affected.
 			// INSERT a record
+			Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+			String startFormatted = formatter.format(t.getStartTime());
+			String endFormatted = formatter.format(t.getEndTime());
+			
 			String sqlInsert = "insert into tasks  (nameTask, descriptionTask, startTime, endTime, assignedTo) " // need a space
-					+ "values ('" + t.getNameTask() + "', '" + t.getDescriptionTask() + "', '" + t.getStartTime() + "', '" + t.getEndTime() +  "', " + t.getAssignedTo().getId() + ")";
+					+ "values ('" + t.getNameTask() + "', '" + t.getDescriptionTask() + "', '" + startFormatted + "', '" + endFormatted +  "', " + t.getAssignedTo().getId() + ")";
 			System.out.println("The SQL query is: " + sqlInsert);  // Echo for debugging
 			int countInserted = stmt.executeUpdate(sqlInsert);
 			System.out.println(countInserted + " records inserted.\n");
 		
 			// Issue a SELECT to check the changes
-			String strSelect = "select * from tasks where taskID= ";
+			String strSelect = "select * from tasks order by taskID desc limit 1";
 			System.out.println("The SQL query is: " + strSelect);  // Echo For debugging
 			ResultSet rset = stmt.executeQuery(strSelect);
 			while(rset.next()) {   // Move the cursor to the next row
@@ -160,21 +161,15 @@ public class TaskDAO {
 	            }
 	            int assignedTo = rset.getInt("assignedTo");
 	            int taskID = rset.getInt("taskID");
-	            /*
-	            // Step 3 & 4: Issue a SELECT to check the UPDATE.
-				String selectUser = "select * from users" + " where ID=" + String.valueOf(assignedTo);
-				System.out.println("The SQL query is: " + strSelect);  // Echo for debugging
-				ResultSet rsetUser = stmt.executeQuery(selectUser);
-				User user = null;
-			
-				while(rsetUser.next()) {   // Move the cursor to the next row
-					String name = rsetUser.getString("firstName");
-		            String surname = rsetUser.getString("surname");
-		            int id = rsetUser.getInt("ID");
-		            user = new User(name, surname, id);
-				}
-				*/
-	            task = new Task(nameTask, descriptionTask, startTime, endTime, null, taskID);
+	            User assignedUser = null;
+	            for (User user : users) {
+	            	int selectedID = user.getId();
+	            	if (selectedID== assignedTo) {
+	            		 assignedUser = user;
+	            	     break;
+	            	}
+	    		}
+	            task = new Task(nameTask, descriptionTask, startTime, endTime, assignedUser, taskID);
 		    }
 		} catch(SQLException ex) {
 			ex.printStackTrace();
@@ -203,12 +198,10 @@ public class TaskDAO {
 			} else {
 				return false;
 			}
-			
 		} catch(SQLException ex) {
 			ex.printStackTrace();
 		} 
 		return false;
 	}
-	
 }
 

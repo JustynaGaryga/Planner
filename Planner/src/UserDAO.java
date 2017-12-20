@@ -100,7 +100,7 @@ public class UserDAO {
 			System.out.println(countInserted + " records inserted.\n");
 			
 			// Issue a SELECT to check the changes
-			String strSelect = "select * from users where ID= ";
+			String strSelect = "select * from users order by ID desc limit 1";
 			System.out.println("The SQL query is: " + strSelect);  // Echo For debugging
 			ResultSet rset = stmt.executeQuery(strSelect);
 			while(rset.next()) {   // Move the cursor to the next row
@@ -136,7 +136,6 @@ public class UserDAO {
 			} else {
 				return false;
 			}
-			
 		} catch(SQLException ex) {
 			ex.printStackTrace();
 		} 
