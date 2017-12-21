@@ -6,6 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
@@ -60,6 +63,19 @@ public class Planner extends JFrame {
 		plannerFrame.getContentPane().setBackground(Color.yellow); // temporary color
 		plannerFrame.setVisible(true);
 		
+		// create the ArrayLists of users and tasks
+		ArrayList<User> users = UserDAO.getUsers();
+		for (User u : users) {
+			usersList.addElement(u);
+		}
+		System.out.println(users.toString());
+		
+		ArrayList<Task> tasks = TaskDAO.getTasks(users);
+		for (Task t : tasks) {
+			tasksList.addElement(t);
+		}
+		System.out.println(tasks.toString());
+		
 		//click on button 
 		addUserButton.addActionListener(new ActionListener() {
 			@Override
@@ -81,7 +97,8 @@ public class Planner extends JFrame {
 			         System.out.println("Name: " + userName.getText());
 			         System.out.println("Surname: " + userSurname.getText());
 			         User newUser = new User(userName.getText(), userSurname.getText());
-			         usersList.addElement(newUser);
+			         User userCreated = UserDAO.insertUser(newUser);
+			         usersList.addElement(userCreated);
 			    }}});
 		
 		// click on button
@@ -103,9 +120,9 @@ public class Planner extends JFrame {
 			    taskPanel.add(taskDescription);
 			    taskPanel.add(new JLabel("Choose the user:"));
 			    taskPanel.add(assignedTo);
-			    taskPanel.add(new JLabel("Start time. Enter dd/mm/yyyy hh:mm")); 
+			    taskPanel.add(new JLabel("Start time. Enter yyyy-MM-dd HH:mm:ss")); 
 			    taskPanel.add(start); // change to field where user can select the date and time
-			    taskPanel.add(new JLabel("End time. Enter dd/mm/yyyy hh:mm"));
+			    taskPanel.add(new JLabel("End time. Enter yyyy-MM-dd HH:mm:ss"));
 			    taskPanel.add(end); // change to field where user can select the date and time
 			    taskPanel.setLayout(new BoxLayout(taskPanel, BoxLayout.Y_AXIS));
 
@@ -118,10 +135,11 @@ public class Planner extends JFrame {
 			         newTask.setStartTime(start.getText());
 			         newTask.setEndTime(end.getText());
 			         newTask.setAssignedTo((User)assignedTo.getSelectedItem());
+			         Task taskCreated = TaskDAO.insertTask(newTask, users);
 			         System.out.println("Start: " + newTask.getStartTime());
 			         System.out.println("End: " + newTask.getEndTime());
 			         System.out.println("Assigned to: " + newTask.getAssignedTo());
-			         tasksList.addElement(newTask);
+			         tasksList.addElement(taskCreated);
 			       
 			    }}});
 		
@@ -140,9 +158,9 @@ public class Planner extends JFrame {
 			    selectPanel.add(Box.createVerticalStrut(15)); // a spacer
 			    selectPanel.add(new JLabel("Choose the user:"));
 			    selectPanel.add(assignedTo);
-			    selectPanel.add(new JLabel("Start time. Enter dd/mm/yyyy hh:mm")); 
+			    selectPanel.add(new JLabel("Start time. Enter yyyy-MM-dd HH:mm:ss")); 
 			    selectPanel.add(start); // change to field where user can select the date and time
-			    selectPanel.add(new JLabel("End time. Enter dd/mm/yyyy hh:mm"));
+			    selectPanel.add(new JLabel("End time. Enter yyyy-MM-dd HH:mm:ss"));
 			    selectPanel.add(end); // change to field where user can select the date and time
 			    selectPanel.setLayout(new BoxLayout(selectPanel, BoxLayout.Y_AXIS));
 			    
@@ -158,7 +176,7 @@ public class Planner extends JFrame {
 	    buttonPanel.setSize(200, 200);
 	    buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
 		
-		// User's list
+		/*User's list
 		User user1 = new User("Justyna", "Garyga");
 		User user2 = new User("Peter", "Garyga");
 		User user3 = new User("Chris", "Garyga");
@@ -168,8 +186,10 @@ public class Planner extends JFrame {
 		usersList.addElement(user2);
 		usersList.addElement(user3);
 		usersList.addElement(user4);
+		/*/ 
+	    // Users that want to use the application and don't have a database yet can use this code to have a working version
 		
-		// Task's list
+	    /* Task's list
 		Task task1 = new Task("Wash clothes", "washing clothes");
 		Task task2 = new Task("Shopping", "buying food and ");
 		Task task3 = new Task("Wash a car", "go to a car wash ");
@@ -185,6 +205,8 @@ public class Planner extends JFrame {
 		tasksList.addElement(task5);
 		tasksList.addElement(task6);
 		tasksList.addElement(task7);
+		*/
+		// Tasks that want to use the application and don't have a database yet can use this code to have a working version
 		
 		Border border = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
 		userLabel.setBorder(border); 
@@ -286,6 +308,11 @@ public class Planner extends JFrame {
 					    System.out.println("Surname: " + userSurname.getText());
 					    editUser.setName(userName.getText());
 					    editUser.setSurname(userSurname.getText());
+					    User u = UserDAO.updateUser(editUser);
+					    if (u != null) {
+					    	editUser.setName(u.getName());
+						    editUser.setSurname(u.getSurname());
+					    }
 					    editUserFrame.dispose();
 					    }
 				});
@@ -295,7 +322,10 @@ public class Planner extends JFrame {
 			    	@Override
 					public void actionPerformed(ActionEvent arg0) {
 			    		int i = usersList.getIndexOf(editUser);
-			    		usersList.removeElementAt(i);
+			    		boolean result = UserDAO.deleteUser(editUser); 
+			    		if (result == true) {
+			    			usersList.removeElementAt(i);
+			    		}
 			    		editUserFrame.dispose();
 			    	}
 				});
@@ -326,6 +356,11 @@ public class Planner extends JFrame {
 				if (listWithTasks.getSelectedValue() != null) {
 		    		taskName.setText(((Task)listWithTasks.getSelectedValue()).getNameTask());
 		    		taskDescription.setText(((Task)listWithTasks.getSelectedValue()).getDescriptionTask());
+		    		Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+					String startFormatted = formatter.format(((Task)listWithTasks.getSelectedValue()).getStartTime());
+					String endFormatted = formatter.format(((Task)listWithTasks.getSelectedValue()).getEndTime());
+		    		start.setText(startFormatted);
+		    		end.setText(endFormatted);
 				}
 
 			    taskPanel.add(new JLabel("Edit name of task:"));
@@ -335,9 +370,9 @@ public class Planner extends JFrame {
 			    taskPanel.add(taskDescription);
 			    taskPanel.add(new JLabel("Choose the user:"));
 			    taskPanel.add(assignedTo);
-			    taskPanel.add(new JLabel("Edit start time. Enter dd/mm/yyyy hh:mm")); 
+			    taskPanel.add(new JLabel("Edit start time. Enter yyyy-MM-dd HH:mm:ss")); 
 			    taskPanel.add(start); // change to field where user can select the date and time
-			    taskPanel.add(new JLabel("Edit end time. Enter dd/mm/yyyy hh:mm"));
+			    taskPanel.add(new JLabel("Edit end time. Enter yyyy-MM-dd HH:mm:ss"));
 			    taskPanel.add(end); // change to field where user can select the date and time
 			    taskPanel.add(deleteTask);
 
@@ -404,6 +439,14 @@ public class Planner extends JFrame {
 						System.out.println("Start: " + editTask.getStartTime());
 						System.out.println("End: " + editTask.getEndTime());
 						System.out.println("Assigned to: " + editTask.getAssignedTo());
+						Task t = TaskDAO.updateTask(editTask, users);
+						    if (t != null) {
+						    	editTask.setNameTask(t.getNameTask());
+							    editTask.setDescriptionTask(t.getDescriptionTask());
+							    editTask.setStartTime(t.getStartTime());
+							    editTask.setEndTime(t.getEndTime());
+							    editTask.setAssignedTo(t.getAssignedTo());
+						    }
 					    editTaskFrame.dispose();
 					    }
 				});
@@ -413,7 +456,10 @@ public class Planner extends JFrame {
 			    	@Override
 					public void actionPerformed(ActionEvent arg0) {
 			    		int i = tasksList.getIndexOf(editTask);
-			    		tasksList.removeElementAt(i);
+			    		boolean result = TaskDAO.deleteTask(editTask); 
+			    		if (result == true) {
+			    			tasksList.removeElementAt(i);
+			    		}
 			    		editTaskFrame.dispose();
 			    	}
 				});

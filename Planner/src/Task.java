@@ -9,6 +9,7 @@ public class Task {
 	Date startTime;
 	Date endTime;
 	User assignedTo;
+	int taskID;
 	
 	/**
 	 * @param nameTask
@@ -19,6 +20,16 @@ public class Task {
 		super();
 		this.nameTask = nameTask;
 		this.descriptionTask = descriptionTask;
+	}
+	
+	public Task(String nameTask, String descriptionTask, Date startTime, Date endTime, User assignedTo, int taskID) {
+		super();
+		this.nameTask = nameTask;
+		this.descriptionTask = descriptionTask;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.assignedTo = assignedTo;
+		this.taskID = taskID;
 	}
 	public String getNameTask() {
 		return nameTask;
@@ -41,7 +52,7 @@ public class Task {
 	public void setStartTime(String startTime) {
 		Date startDate;
 		try {
-			startDate = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(startTime);
+			startDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(startTime);
 			this.startTime = startDate;
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
@@ -54,7 +65,7 @@ public class Task {
 	public void setEndTime(String endTime) {
 		Date endDate;
 		try {
-			endDate = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(endTime);
+			endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(endTime);
 			this.endTime = endDate;
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
@@ -72,5 +83,11 @@ public class Task {
 	}
 	public void setAssignedTo(User assignedTo) {
 		this.assignedTo = assignedTo;
+	}
+	public int getTaskID() {
+		return taskID;
+	}
+	public void setTaskID(int taskID) {
+		this.taskID = taskID;
 	}
 }
