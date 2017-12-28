@@ -4,12 +4,17 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.sql.SQLException;
 import java.text.Format;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
@@ -18,6 +23,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -58,7 +64,7 @@ public class Planner extends JFrame {
 	public Planner() {
 		super ("Planner. Learn IT, Girl!");
 		plannerFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		plannerFrame.setSize(800, 500);
+		plannerFrame.setSize(800, 600);
 		plannerFrame.setLocation(300, 50);
 		plannerFrame.getContentPane().setBackground(Color.yellow); // temporary color
 		plannerFrame.setVisible(true);
@@ -101,18 +107,47 @@ public class Planner extends JFrame {
 			         usersList.addElement(userCreated);
 			    }}});
 		
-		// click on button
+		DefaultComboBoxModel<String> dayList = new DefaultComboBoxModel<>();
+		JList listWithDays = new JList(dayList);
+		for (int i = 1; i < 32; i++) {
+			dayList.addElement(String.format("%02d", i));
+		}
+		
+		DefaultComboBoxModel<String> monthList = new DefaultComboBoxModel<>();
+		JList listWithMonths = new JList(monthList);
+		for (int i = 1; i < 13 ; i++) {
+			monthList.addElement(String.format("%02d", i));
+		}
+		
+		DefaultComboBoxModel<Integer> yearList = new DefaultComboBoxModel<>();
+		JList listWithYears = new JList(yearList);
+		for (int i = 2017; i < 2050 ; i++) {
+			yearList.addElement(i);
+		}
+		
+		// click on button Add new task
 		addTaskButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
 				JComboBox selectTask = new JComboBox(tasksList);
 				JComboBox assignedTo = new JComboBox(usersList);
+			    JComboBox days = new JComboBox(dayList);
+			    JComboBox months = new JComboBox(monthList);
+			    JComboBox years = new JComboBox(yearList);
 				JTextField start = new JTextField(30);
 			    JTextField end = new JTextField(30);
 				JTextField taskName = new JTextField(25);
 			    JTextField taskDescription = new JTextField(30);
+			    JCheckBox repeatableEachYear = new JCheckBox("Repeatable each year");
 			    JPanel taskPanel = new JPanel();
+			    JPanel datePanel = new JPanel();
+			    
+			    start.setText(years.getSelectedItem().toString() + "-" + months.getSelectedItem().toString() + "-" + days.getSelectedItem().toString());
+			    datePanel.add(days);
+			    datePanel.add(months);
+			    datePanel.add(years);
+			    
 			    taskPanel.add(new JLabel("Name of task:"));
 			    taskPanel.add(taskName);
 			    taskPanel.add(Box.createVerticalStrut(15)); // a spacer
@@ -122,8 +157,11 @@ public class Planner extends JFrame {
 			    taskPanel.add(assignedTo);
 			    taskPanel.add(new JLabel("Start time. Enter yyyy-MM-dd HH:mm:ss")); 
 			    taskPanel.add(start); // change to field where user can select the date and time
+			    taskPanel.add(datePanel);
 			    taskPanel.add(new JLabel("End time. Enter yyyy-MM-dd HH:mm:ss"));
 			    taskPanel.add(end); // change to field where user can select the date and time
+			    taskPanel.add(datePanel);
+			    taskPanel.add(repeatableEachYear);
 			    taskPanel.setLayout(new BoxLayout(taskPanel, BoxLayout.Y_AXIS));
 
 			    int result = JOptionPane.showConfirmDialog(null, taskPanel, 
@@ -135,15 +173,33 @@ public class Planner extends JFrame {
 			         newTask.setStartTime(start.getText());
 			         newTask.setEndTime(end.getText());
 			         newTask.setAssignedTo((User)assignedTo.getSelectedItem());
+			   
 			         Task taskCreated = TaskDAO.insertTask(newTask, users);
 			         System.out.println("Start: " + newTask.getStartTime());
 			         System.out.println("End: " + newTask.getEndTime());
 			         System.out.println("Assigned to: " + newTask.getAssignedTo());
+			         System.out.println("Start: " + taskCreated.getStartTime());
+			         System.out.println("End: " + taskCreated.getEndTime());
+			         System.out.println("Assigned to: " + taskCreated.getAssignedTo());
 			         tasksList.addElement(taskCreated);
-			       
-			    }}});
+
+			        if (repeatableEachYear.isSelected()) {
+			        	int year = taskCreated.getStartTime().getYear();
+			        	for (int i = 1; i <= 10; i++) {
+			        		Task t = new Task(taskName.getText(), taskDescription.getText()); 
+			        		Date startDate = taskCreated.getStartTime();
+			        		startDate.setYear(year + i);
+			        		t.setStartTime(startDate); 
+			        		Date endDate = taskCreated.getEndTime();
+			        		endDate.setYear(year + i);
+			        		t.setEndTime(endDate); 	
+			        		t.setAssignedTo(taskCreated.getAssignedTo());
+			        		TaskDAO.insertTask(t, users); 
+			        	}
+			         }
+		}}});
 		
-		// click on button
+		// click on button 
 		selectTaskButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -322,28 +378,38 @@ public class Planner extends JFrame {
 			    	@Override
 					public void actionPerformed(ActionEvent arg0) {
 			    		int i = usersList.getIndexOf(editUser);
-			    		boolean result = UserDAO.deleteUser(editUser); 
-			    		if (result == true) {
-			    			usersList.removeElementAt(i);
-			    		}
+			    		try {
+			    			boolean result = UserDAO.deleteUser(editUser); 
+			    			if (result == true) {
+			    				usersList.removeElementAt(i);
+			    			}
+			    	
 			    		editUserFrame.dispose();
+			    		} catch (SQLException e) {
+			    			JFrame frame = new JFrame();
+			    			JOptionPane.showMessageDialog(frame,
+			    				"You can't delete the user, who is assigned to the task.",
+			    				"Inane warning",
+			    				JOptionPane.WARNING_MESSAGE);
+			    		}
 			    	}
 				});
 			}
 		});
 		
-		// show a dialog for edit task, when we click on the task- to change it to JFrame!
+		// show a dialog for edit task, when we click on the task
 		listWithTasks.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent evtT) {
 				//JFrame to edit User
 				JFrame editTaskFrame = new JFrame("Edit the task");
 				editTaskFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); //clicking on X - do nothing
-				editTaskFrame.setSize(300, 300);
+				editTaskFrame.setSize(350, 350);
 				editTaskFrame.setLocation(600, 200);
 				JComboBox selectTask = new JComboBox(tasksList);
 				JComboBox assignedTo = new JComboBox(usersList);
 				JTextField taskName = new JTextField(25);
 			    JTextField taskDescription = new JTextField(30);
+			    JCheckBox repeatableEachYear = new JCheckBox("Repeatable each year");
 			    JTextField start = new JTextField(30);
 			    JTextField end = new JTextField(30);
 			    JPanel okCancelPanel = new JPanel();
@@ -352,17 +418,19 @@ public class Planner extends JFrame {
 			    JButton cancelButton = new JButton("Cancel");
 			    Task editTask = (Task)listWithTasks.getSelectedValue();
 				JPanel taskPanel = new JPanel();
-				
+
 				if (listWithTasks.getSelectedValue() != null) {
 		    		taskName.setText(((Task)listWithTasks.getSelectedValue()).getNameTask());
 		    		taskDescription.setText(((Task)listWithTasks.getSelectedValue()).getDescriptionTask());
 		    		Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+		    		System.out.println(((Task)listWithTasks.getSelectedValue()).getStartTime().toString());
 					String startFormatted = formatter.format(((Task)listWithTasks.getSelectedValue()).getStartTime());
 					String endFormatted = formatter.format(((Task)listWithTasks.getSelectedValue()).getEndTime());
 		    		start.setText(startFormatted);
 		    		end.setText(endFormatted);
+		    		assignedTo.setSelectedItem(((Task)listWithTasks.getSelectedValue()).getAssignedTo());
 				}
-
+			
 			    taskPanel.add(new JLabel("Edit name of task:"));
 			    taskPanel.add(taskName);
 			    taskPanel.add(Box.createVerticalStrut(15)); // a spacer
@@ -375,6 +443,7 @@ public class Planner extends JFrame {
 			    taskPanel.add(new JLabel("Edit end time. Enter yyyy-MM-dd HH:mm:ss"));
 			    taskPanel.add(end); // change to field where user can select the date and time
 			    taskPanel.add(deleteTask);
+			    taskPanel.add(repeatableEachYear);
 
 			    okButton.setEnabled(false);
 				cancelButton.setEnabled(true);
@@ -424,7 +493,7 @@ public class Planner extends JFrame {
 					}
 				});
 				
-				// button OK to save the changed user's name and/or surname
+				// button OK to save the changed task's name, description, start, end time
 				okButton.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent arg0) {
@@ -434,6 +503,7 @@ public class Planner extends JFrame {
 						editTask.setDescriptionTask(taskDescription.getText());
 						editTask.setStartTime(start.getText());
 						editTask.setEndTime(end.getText());
+						editTask.setAssignedTo((User)assignedTo.getSelectedItem());
 						System.out.println("Name of task: " + taskName.getText());
 						System.out.println("Description of task: " + taskDescription.getText());
 						System.out.println("Start: " + editTask.getStartTime());
@@ -451,7 +521,7 @@ public class Planner extends JFrame {
 					    }
 				});
 				
-				// button to delete the user from the list of users
+				// button to delete the task from the list of tasks
 			    deleteTask.addActionListener(new ActionListener() {
 			    	@Override
 					public void actionPerformed(ActionEvent arg0) {
@@ -481,7 +551,8 @@ public class Planner extends JFrame {
 		JScrollPane sp=new JScrollPane(calendar);
 		int rowCount = 5;
 		model.setRowCount(rowCount);
-		
+	
+		// last month
 		JButton buttonLow = new JButton("<-");
 			buttonLow.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent ae) {
@@ -489,7 +560,8 @@ public class Planner extends JFrame {
 					updateMonth();
 				}
 		    });
-			
+		
+		// next month
 		JButton buttonHight = new JButton("->");
 			buttonHight.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent ae) {
@@ -509,6 +581,12 @@ public class Planner extends JFrame {
 		plannerFrame.add(calPanel);
 		
 		this.updateMonth();
+
+		Date today = Calendar.getInstance().getTime();
+		System.out.println("Today is: " + today);
+		JTextField todayField = new JTextField(today.toString());
+		plannerFrame.add(todayField, BorderLayout.PAGE_END);
+
 	}
 	
 	//method to update month 

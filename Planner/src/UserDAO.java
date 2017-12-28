@@ -115,7 +115,7 @@ public class UserDAO {
 		return user;
 	}
 	
-	static boolean deleteUser(User u) {
+	static boolean deleteUser(User u) throws SQLException {
 		try {
 			// Step 1: Allocate a database 'Connection' object
 			Connection conn = DriverManager.getConnection(
@@ -137,8 +137,7 @@ public class UserDAO {
 				return false;
 			}
 		} catch(SQLException ex) {
-			ex.printStackTrace();
+			throw(ex);
 		} 
-		return false;
 	}
 }
