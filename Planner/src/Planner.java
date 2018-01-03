@@ -125,6 +125,18 @@ public class Planner extends JFrame {
 			yearList.addElement(i);
 		}
 		
+		DefaultComboBoxModel<String> hourList = new DefaultComboBoxModel<>();
+		JList listWithHours = new JList(hourList);
+		for (int i = 0; i <= 24; i++) {
+			hourList.addElement(String.format("%02d", i));
+		}
+		
+		DefaultComboBoxModel<String> minuteList = new DefaultComboBoxModel<>();
+		JList listWithMinutes = new JList(minuteList);
+		for (int i = 0; i <= 60 ; i++) {
+			minuteList.addElement(String.format("%02d", i));
+		}
+		
 		// click on button Add new task
 		addTaskButton.addActionListener(new ActionListener() {
 			@Override
@@ -132,21 +144,39 @@ public class Planner extends JFrame {
 				// TODO Auto-generated method stub
 				JComboBox selectTask = new JComboBox(tasksList);
 				JComboBox assignedTo = new JComboBox(usersList);
-			    JComboBox days = new JComboBox(dayList);
-			    JComboBox months = new JComboBox(monthList);
-			    JComboBox years = new JComboBox(yearList);
+			    JComboBox dayStart = new JComboBox(dayList);
+			    JComboBox monthStart = new JComboBox(monthList);
+			    JComboBox yearStart = new JComboBox(yearList);
+			    JComboBox hourStart = new JComboBox(hourList);
+			    JComboBox minuteStart = new JComboBox(minuteList);
+			    JComboBox dayEnd = new JComboBox(dayList);
+			    JComboBox monthEnd = new JComboBox(monthList);
+			    JComboBox yearEnd = new JComboBox(yearList);
+			    JComboBox hourEnd = new JComboBox(hourList);
+			    JComboBox minuteEnd = new JComboBox(minuteList);
 				JTextField start = new JTextField(30);
 			    JTextField end = new JTextField(30);
 				JTextField taskName = new JTextField(25);
 			    JTextField taskDescription = new JTextField(30);
 			    JCheckBox repeatableEachYear = new JCheckBox("Repeatable each year");
 			    JPanel taskPanel = new JPanel();
-			    JPanel datePanel = new JPanel();
+			    JPanel datePanelStart = new JPanel();
+			    JPanel datePanelEnd = new JPanel();
 			    
-			    start.setText(years.getSelectedItem().toString() + "-" + months.getSelectedItem().toString() + "-" + days.getSelectedItem().toString());
-			    datePanel.add(days);
-			    datePanel.add(months);
-			    datePanel.add(years);
+			    start.setText(yearStart.getSelectedItem().toString() + "-" + monthStart.getSelectedItem().toString() + "-" + 
+			    dayStart.getSelectedItem().toString() + " " + hourStart.getSelectedItem().toString() + ":" + minuteStart.getSelectedItem().toString() );		    
+			    datePanelStart.add(dayStart);
+			    datePanelStart.add(monthStart);
+			    datePanelStart.add(yearStart);
+			    datePanelStart.add(hourStart);
+			    datePanelStart.add(minuteStart);
+			    end.setText(yearEnd.getSelectedItem().toString() + "-" + monthEnd.getSelectedItem().toString() + "-" + 
+			    dayEnd.getSelectedItem().toString() + " " + hourEnd.getSelectedItem().toString() + ":" + minuteEnd.getSelectedItem().toString() );
+			    datePanelEnd.add(dayEnd);
+			    datePanelEnd.add(monthEnd);
+			    datePanelEnd.add(yearEnd);
+			    datePanelEnd.add(hourEnd);
+			    datePanelEnd.add(minuteEnd);
 			    
 			    taskPanel.add(new JLabel("Name of task:"));
 			    taskPanel.add(taskName);
@@ -157,10 +187,10 @@ public class Planner extends JFrame {
 			    taskPanel.add(assignedTo);
 			    taskPanel.add(new JLabel("Start time. Enter yyyy-MM-dd HH:mm:ss")); 
 			    taskPanel.add(start); // change to field where user can select the date and time
-			    taskPanel.add(datePanel);
+			    taskPanel.add(datePanelStart);
 			    taskPanel.add(new JLabel("End time. Enter yyyy-MM-dd HH:mm:ss"));
 			    taskPanel.add(end); // change to field where user can select the date and time
-			    taskPanel.add(datePanel);
+			    taskPanel.add(datePanelEnd);
 			    taskPanel.add(repeatableEachYear);
 			    taskPanel.setLayout(new BoxLayout(taskPanel, BoxLayout.Y_AXIS));
 
@@ -383,14 +413,14 @@ public class Planner extends JFrame {
 			    			if (result == true) {
 			    				usersList.removeElementAt(i);
 			    			}
-			    	
-			    		editUserFrame.dispose();
 			    		} catch (SQLException e) {
 			    			JFrame frame = new JFrame();
 			    			JOptionPane.showMessageDialog(frame,
-			    				"You can't delete the user, who is assigned to the task.",
+			    				"This user can not be deleted as it has one more tasks assigned to him.",
 			    				"Inane warning",
 			    				JOptionPane.WARNING_MESSAGE);
+			    		} finally {
+			    			editUserFrame.dispose();
 			    		}
 			    	}
 				});
