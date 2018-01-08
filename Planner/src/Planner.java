@@ -1,5 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -33,6 +34,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
@@ -54,7 +56,9 @@ public class Planner extends JFrame {
 	JButton selectTaskButton = new JButton("Choose new task");
 	JLabel userLabel = new JLabel (" USERS: ", SwingConstants.LEFT);
 	JLabel taskLabel = new JLabel (" TASKS: ", SwingConstants.LEFT);
+	JLabel taskTodayLabel = new JLabel (" Today's TASKS: ", SwingConstants.LEFT);
 	JLabel monthLabel = new JLabel();
+	Date today = Calendar.getInstance().getTime();
 	
 	DefaultComboBoxModel<User> usersList = new DefaultComboBoxModel<>();
 	DefaultComboBoxModel<Task> tasksList = new DefaultComboBoxModel<>();
@@ -82,7 +86,7 @@ public class Planner extends JFrame {
 		}
 		System.out.println(tasks.toString());
 		
-		//click on button 
+		// button for adding new users
 		addUserButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -107,77 +111,211 @@ public class Planner extends JFrame {
 			         usersList.addElement(userCreated);
 			    }}});
 		
-		DefaultComboBoxModel<String> dayList = new DefaultComboBoxModel<>();
-		JList listWithDays = new JList(dayList);
-		for (int i = 1; i < 32; i++) {
-			dayList.addElement(String.format("%02d", i));
+		// lists with years, months, days, hours and minutes- JComboBoxes in dialog for adding a new task
+		DefaultComboBoxModel<String> dayListS = new DefaultComboBoxModel<>();
+		DefaultComboBoxModel<String> dayListE = new DefaultComboBoxModel<>();
+		JList listWithDayS = new JList(dayListS);
+		JList listWithDaysE = new JList(dayListE);
+		for (int i = 1; i <= 31; i++) {
+			dayListS.addElement(String.format("%02d", i));
+		}
+		for (int i = 1; i <= 31; i++) {
+			dayListE.addElement(String.format("%02d", i));
 		}
 		
-		DefaultComboBoxModel<String> monthList = new DefaultComboBoxModel<>();
-		JList listWithMonths = new JList(monthList);
-		for (int i = 1; i < 13 ; i++) {
-			monthList.addElement(String.format("%02d", i));
+		DefaultComboBoxModel<String> monthListS = new DefaultComboBoxModel<>();
+		DefaultComboBoxModel<String> monthListE = new DefaultComboBoxModel<>();
+		JList listWithMonthS = new JList(monthListS);
+		JList listWithMonthE = new JList(monthListE);
+		for (int i = 1; i <= 12; i++) {
+			monthListS.addElement(String.format("%02d", i));
+		}
+		for (int i = 1; i <= 12; i++) {
+			monthListE.addElement(String.format("%02d", i));
 		}
 		
-		DefaultComboBoxModel<Integer> yearList = new DefaultComboBoxModel<>();
-		JList listWithYears = new JList(yearList);
-		for (int i = 2017; i < 2050 ; i++) {
-			yearList.addElement(i);
+		DefaultComboBoxModel<String> yearListS = new DefaultComboBoxModel<>();
+		DefaultComboBoxModel<String> yearListE = new DefaultComboBoxModel<>();
+		JList listWithYearS = new JList(yearListS);
+		JList listWithYearE = new JList(yearListE);
+		for (int i = 2018; i < 2040; i++) {
+			yearListS.addElement(String.format("%02d", i));
+		}
+		for (int i = 2018; i < 2040; i++) {
+			yearListE.addElement(String.format("%02d", i));
 		}
 		
-		DefaultComboBoxModel<String> hourList = new DefaultComboBoxModel<>();
-		JList listWithHours = new JList(hourList);
+		DefaultComboBoxModel<String> hourListS = new DefaultComboBoxModel<>();
+		DefaultComboBoxModel<String> hourListE = new DefaultComboBoxModel<>();
+		JList listWithHourS = new JList(hourListS);
+		JList listWithHourE = new JList(hourListE);
 		for (int i = 0; i <= 24; i++) {
-			hourList.addElement(String.format("%02d", i));
+			hourListS.addElement(String.format("%02d", i));
+		}
+		for (int i = 0; i <= 24; i++) {
+			hourListE.addElement(String.format("%02d", i));
 		}
 		
-		DefaultComboBoxModel<String> minuteList = new DefaultComboBoxModel<>();
-		JList listWithMinutes = new JList(minuteList);
+		DefaultComboBoxModel<String> minuteListS = new DefaultComboBoxModel<>();
+		DefaultComboBoxModel<String> minuteListE = new DefaultComboBoxModel<>();
+		JList listWithMinuteS = new JList(minuteListS);
+		JList listWithMinuteE = new JList(minuteListE);
 		for (int i = 0; i <= 60 ; i++) {
-			minuteList.addElement(String.format("%02d", i));
+			minuteListS.addElement(String.format("%02d", i));
+		}
+		for (int i = 0; i <= 60 ; i++) {
+			minuteListE.addElement(String.format("%02d", i));
 		}
 		
-		// click on button Add new task
+		// button for adding new task
 		addTaskButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
 				JComboBox selectTask = new JComboBox(tasksList);
 				JComboBox assignedTo = new JComboBox(usersList);
-			    JComboBox dayStart = new JComboBox(dayList);
-			    JComboBox monthStart = new JComboBox(monthList);
-			    JComboBox yearStart = new JComboBox(yearList);
-			    JComboBox hourStart = new JComboBox(hourList);
-			    JComboBox minuteStart = new JComboBox(minuteList);
-			    JComboBox dayEnd = new JComboBox(dayList);
-			    JComboBox monthEnd = new JComboBox(monthList);
-			    JComboBox yearEnd = new JComboBox(yearList);
-			    JComboBox hourEnd = new JComboBox(hourList);
-			    JComboBox minuteEnd = new JComboBox(minuteList);
+			    JComboBox dayStart = new JComboBox(dayListS);
+			    JComboBox monthStart = new JComboBox(monthListS);
+			    JComboBox yearStart = new JComboBox(yearListS);
+			    JComboBox hourStart = new JComboBox(hourListS);
+			    JComboBox minuteStart = new JComboBox(minuteListS);
+			    JComboBox dayEnd = new JComboBox(dayListE);
+			    JComboBox monthEnd = new JComboBox(monthListE);
+			    JComboBox yearEnd = new JComboBox(yearListE);
+			    JComboBox hourEnd = new JComboBox(hourListE);
+			    JComboBox minuteEnd = new JComboBox(minuteListE);
 				JTextField start = new JTextField(30);
 			    JTextField end = new JTextField(30);
 				JTextField taskName = new JTextField(25);
 			    JTextField taskDescription = new JTextField(30);
-			    JCheckBox repeatableEachYear = new JCheckBox("Repeatable each year");
+			    JCheckBox repeatableEachYear = new JCheckBox("Repeatable yearly");
+			    JCheckBox repeatableMonthly = new JCheckBox("Repeatable monthly");
 			    JPanel taskPanel = new JPanel();
 			    JPanel datePanelStart = new JPanel();
 			    JPanel datePanelEnd = new JPanel();
 			    
+			    start.setEditable(false);
+			    end.setEditable(false);
+			    
+			    // JComboBoxes for choose the date- start with today's date 
+			    yearStart.setSelectedItem(Calendar.getInstance().get(Calendar.YEAR));
+			    monthStart.setSelectedIndex(Calendar.getInstance().get(Calendar.MONTH));
+			    dayStart.setSelectedIndex(Calendar.getInstance().get(Calendar.DAY_OF_MONTH) - 1);
+			    hourStart.setSelectedIndex(Calendar.getInstance().get(Calendar.HOUR));
+			    minuteStart.setSelectedIndex(Calendar.getInstance().get(Calendar.MINUTE));
+			    yearEnd.setSelectedItem(Calendar.getInstance().get(Calendar.YEAR));
+			    monthEnd.setSelectedIndex(Calendar.getInstance().get(Calendar.MONTH));
+			    dayEnd.setSelectedIndex(Calendar.getInstance().get(Calendar.DAY_OF_MONTH) - 1);
+			    hourEnd.setSelectedIndex(Calendar.getInstance().get(Calendar.HOUR));
+			    minuteEnd.setSelectedIndex(Calendar.getInstance().get(Calendar.MINUTE));
+			    System.out.println(Calendar.getInstance().get(Calendar.YEAR));
+			    System.out.println(Calendar.getInstance().get(Calendar.MONTH));
+			    System.out.println(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+			    
+			    // display the date from JComboBoxes in the JTextFields
 			    start.setText(yearStart.getSelectedItem().toString() + "-" + monthStart.getSelectedItem().toString() + "-" + 
-			    dayStart.getSelectedItem().toString() + " " + hourStart.getSelectedItem().toString() + ":" + minuteStart.getSelectedItem().toString() );		    
-			    datePanelStart.add(dayStart);
-			    datePanelStart.add(monthStart);
+			    		dayStart.getSelectedItem().toString() + " " + hourStart.getSelectedItem().toString() + ":" + minuteStart.getSelectedItem().toString() + ":00");		    
+			    end.setText(yearEnd.getSelectedItem().toString() + "-" + monthEnd.getSelectedItem().toString() + "-" + 
+					    dayEnd.getSelectedItem().toString() + " " + hourEnd.getSelectedItem().toString() + ":" + minuteEnd.getSelectedItem().toString() + ":00");
+			    
+			    // listeners for JComboBoxes- start time
+			    yearStart.addActionListener(
+			    	    new ActionListener(){
+			    	        public void actionPerformed(ActionEvent e){
+			    	        	start.setText(yearStart.getSelectedItem().toString() + "-" + monthStart.getSelectedItem().toString() + "-" + 
+			    			    		dayStart.getSelectedItem().toString() + " " + hourStart.getSelectedItem().toString() + ":" + minuteStart.getSelectedItem().toString() + ":00");
+			    	        }
+			    	    }            
+			    	);
+			    monthStart.addActionListener(
+			    	    new ActionListener(){
+			    	        public void actionPerformed(ActionEvent e){
+			    	        	start.setText(yearStart.getSelectedItem().toString() + "-" + monthStart.getSelectedItem().toString() + "-" + 
+			    			    		dayStart.getSelectedItem().toString() + " " + hourStart.getSelectedItem().toString() + ":" + minuteStart.getSelectedItem().toString() + ":00");
+			    	        }
+			    	    }            
+			    	);
+			    dayStart.addActionListener(
+			    	    new ActionListener(){
+			    	        public void actionPerformed(ActionEvent e){
+			    	        	start.setText(yearStart.getSelectedItem().toString() + "-" + monthStart.getSelectedItem().toString() + "-" + 
+			    			    		dayStart.getSelectedItem().toString() + " " + hourStart.getSelectedItem().toString() + ":" + minuteStart.getSelectedItem().toString() + ":00");
+			    	        }
+			    	    }            
+			    	);
+			    hourStart.addActionListener(
+			    	    new ActionListener(){
+			    	        public void actionPerformed(ActionEvent e){
+			    	        	start.setText(yearStart.getSelectedItem().toString() + "-" + monthStart.getSelectedItem().toString() + "-" + 
+			    			    		dayStart.getSelectedItem().toString() + " " + hourStart.getSelectedItem().toString() + ":" + minuteStart.getSelectedItem().toString() + ":00");
+			    	        }
+			    	    }            
+			    	);
+			    minuteStart.addActionListener(
+			    	    new ActionListener(){
+			    	        public void actionPerformed(ActionEvent e){
+			    	        	start.setText(yearStart.getSelectedItem().toString() + "-" + monthStart.getSelectedItem().toString() + "-" + 
+			    			    		dayStart.getSelectedItem().toString() + " " + hourStart.getSelectedItem().toString() + ":" + minuteStart.getSelectedItem().toString() + ":00");
+			    	        }
+			    	    }            
+			    	);
+			    
+			    // listeners for JComboBoxes- end time
+			    yearEnd.addActionListener(
+			    	    new ActionListener(){
+			    	        public void actionPerformed(ActionEvent e){
+			    	        	end.setText(yearEnd.getSelectedItem().toString() + "-" + monthEnd.getSelectedItem().toString() + "-" + 
+			    					    dayEnd.getSelectedItem().toString() + " " + hourEnd.getSelectedItem().toString() + ":" + minuteEnd.getSelectedItem().toString() + ":00");
+			    	        }
+			    	    }            
+			    	);
+			    monthEnd.addActionListener(
+			    	    new ActionListener(){
+			    	        public void actionPerformed(ActionEvent e){
+			    	        	end.setText(yearEnd.getSelectedItem().toString() + "-" + monthEnd.getSelectedItem().toString() + "-" + 
+			    					    dayEnd.getSelectedItem().toString() + " " + hourEnd.getSelectedItem().toString() + ":" + minuteEnd.getSelectedItem().toString() + ":00");
+			    	        }
+			    	    }            
+			    	);
+			    dayEnd.addActionListener(
+			    	    new ActionListener(){
+			    	        public void actionPerformed(ActionEvent e){
+			    	        	end.setText(yearEnd.getSelectedItem().toString() + "-" + monthEnd.getSelectedItem().toString() + "-" + 
+			    					    dayEnd.getSelectedItem().toString() + " " + hourEnd.getSelectedItem().toString() + ":" + minuteEnd.getSelectedItem().toString() + ":00");
+			    	        }
+			    	    }            
+			    	);
+			    hourEnd.addActionListener(
+			    	    new ActionListener(){
+			    	        public void actionPerformed(ActionEvent e){
+			    	        	end.setText(yearEnd.getSelectedItem().toString() + "-" + monthEnd.getSelectedItem().toString() + "-" + 
+			    					    dayEnd.getSelectedItem().toString() + " " + hourEnd.getSelectedItem().toString() + ":" + minuteEnd.getSelectedItem().toString() + ":00");
+			    	        }
+			    	    }            
+			    	);
+			    minuteEnd.addActionListener(
+			    	    new ActionListener(){
+			    	        public void actionPerformed(ActionEvent e){
+			    	        	end.setText(yearEnd.getSelectedItem().toString() + "-" + monthEnd.getSelectedItem().toString() + "-" + 
+			    					    dayEnd.getSelectedItem().toString() + " " + hourEnd.getSelectedItem().toString() + ":" + minuteEnd.getSelectedItem().toString() + ":00");
+			    	        }
+			    	    }            
+			    	);
+			    
+			    // create the panels with the JComboBoxes (start and end date)
 			    datePanelStart.add(yearStart);
+			    datePanelStart.add(monthStart);
+			    datePanelStart.add(dayStart);
 			    datePanelStart.add(hourStart);
 			    datePanelStart.add(minuteStart);
-			    end.setText(yearEnd.getSelectedItem().toString() + "-" + monthEnd.getSelectedItem().toString() + "-" + 
-			    dayEnd.getSelectedItem().toString() + " " + hourEnd.getSelectedItem().toString() + ":" + minuteEnd.getSelectedItem().toString() );
-			    datePanelEnd.add(dayEnd);
-			    datePanelEnd.add(monthEnd);
+			    
 			    datePanelEnd.add(yearEnd);
+			    datePanelEnd.add(monthEnd);
+			    datePanelEnd.add(dayEnd);
 			    datePanelEnd.add(hourEnd);
 			    datePanelEnd.add(minuteEnd);
 			    
+			    //create the panel for tasks
 			    taskPanel.add(new JLabel("Name of task:"));
 			    taskPanel.add(taskName);
 			    taskPanel.add(Box.createVerticalStrut(15)); // a spacer
@@ -185,15 +323,16 @@ public class Planner extends JFrame {
 			    taskPanel.add(taskDescription);
 			    taskPanel.add(new JLabel("Choose the user:"));
 			    taskPanel.add(assignedTo);
-			    taskPanel.add(new JLabel("Start time. Enter yyyy-MM-dd HH:mm:ss")); 
-			    taskPanel.add(start); // change to field where user can select the date and time
+			    taskPanel.add(new JLabel("Start time: ")); 
+			    taskPanel.add(start); 
 			    taskPanel.add(datePanelStart);
-			    taskPanel.add(new JLabel("End time. Enter yyyy-MM-dd HH:mm:ss"));
-			    taskPanel.add(end); // change to field where user can select the date and time
+			    taskPanel.add(new JLabel("End time: "));
+			    taskPanel.add(end); 
 			    taskPanel.add(datePanelEnd);
 			    taskPanel.add(repeatableEachYear);
+			    taskPanel.add(repeatableMonthly);
 			    taskPanel.setLayout(new BoxLayout(taskPanel, BoxLayout.Y_AXIS));
-
+			    
 			    int result = JOptionPane.showConfirmDialog(null, taskPanel, 
 			               "Create a new Task", JOptionPane.OK_CANCEL_OPTION);
 			    if (result == JOptionPane.OK_OPTION) {
@@ -212,8 +351,9 @@ public class Planner extends JFrame {
 			         System.out.println("End: " + taskCreated.getEndTime());
 			         System.out.println("Assigned to: " + taskCreated.getAssignedTo());
 			         tasksList.addElement(taskCreated);
-
-			        if (repeatableEachYear.isSelected()) {
+			         
+			         // save tasks repeatable yearly
+			         if (repeatableEachYear.isSelected()) {
 			        	int year = taskCreated.getStartTime().getYear();
 			        	for (int i = 1; i <= 10; i++) {
 			        		Task t = new Task(taskName.getText(), taskDescription.getText()); 
@@ -227,7 +367,23 @@ public class Planner extends JFrame {
 			        		TaskDAO.insertTask(t, users); 
 			        	}
 			         }
-		}}});
+			         
+			      // save tasks repeatable monthly
+			         if (repeatableMonthly.isSelected()) {
+						int month = taskCreated.getStartTime().getMonth();
+						for (int i = 1; i <= 12; i++) {
+							Task t = new Task(taskName.getText(), taskDescription.getText()); 
+							Date startDate = taskCreated.getStartTime();
+							startDate.setMonth(month + i);
+							t.setStartTime(startDate); 
+							Date endDate = taskCreated.getEndTime();
+							endDate.setMonth(month + i);
+							t.setEndTime(endDate); 	
+							t.setAssignedTo(taskCreated.getAssignedTo());
+							TaskDAO.insertTask(t, users); 
+						}
+					}
+			    }}});
 		
 		// click on button 
 		selectTaskButton.addActionListener(new ActionListener() {
@@ -294,16 +450,31 @@ public class Planner extends JFrame {
 		*/
 		// Tasks that want to use the application and don't have a database yet can use this code to have a working version
 		
+	    // list with today's tasks 
+	    DefaultComboBoxModel<Task> tasksToday = new DefaultComboBoxModel<>();
+	 	JList listWithTasksToday= new JList(tasksToday);
+	    ArrayList<Task> tasksTod = TaskDAO.getTasks(users);
+	    for (Task t : tasks) {
+ 			if (t.getStartTime().equals(today)) {
+ 			tasksToday.addElement(t);
+ 			}
+	    }	
+	 	System.out.println(tasksTod.toString());
+	 		
+	    
 		Border border = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
 		userLabel.setBorder(border); 
 		taskLabel.setBorder(border);
+		taskTodayLabel.setBorder(border);
 		
 		// the panel with list on the left side
 		listPanel.add(userLabel); 
 		listPanel.add(listWithUsers);
 		listPanel.add(Box.createRigidArea(new Dimension(0,20)));
-		listPanel.add(taskLabel);
-		listPanel.add(listWithTasks);
+		//listPanel.add(taskLabel);
+		//listPanel.add(listWithTasks);
+		listPanel.add(taskTodayLabel);
+		listPanel.add(listWithTasksToday);
 		listPanel.setBackground(Color.white);
 		listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
 		
@@ -576,12 +747,29 @@ public class Planner extends JFrame {
 
 		calendar.setRowHeight(70);
 		calendar.setCellSelectionEnabled(true); // cells are clicable
+		calendar.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		calendar.setShowGrid(true); 
 		calendar.setGridColor(Color.LIGHT_GRAY);
 		JScrollPane sp=new JScrollPane(calendar);
 		int rowCount = 5;
 		model.setRowCount(rowCount);
-	
+		
+		ListSelectionModel cellSelectionModel = calendar.getSelectionModel();
+
+	    cellSelectionModel.addListSelectionListener(new ListSelectionListener() {
+	      public void valueChanged(ListSelectionEvent e) {
+	        Integer selectedData = null;
+
+	        int selectedRow = calendar.getSelectedRow();
+	        int selectedColumn = calendar.getSelectedColumn();
+
+	        selectedData = (Integer) calendar.getValueAt(selectedRow, selectedColumn);
+	      
+	        System.out.println("Selected: " + selectedData);
+	      }
+
+	    });
+		
 		// last month
 		JButton buttonLow = new JButton("<-");
 			buttonLow.addActionListener(new ActionListener() {
@@ -612,11 +800,9 @@ public class Planner extends JFrame {
 		
 		this.updateMonth();
 
-		Date today = Calendar.getInstance().getTime();
 		System.out.println("Today is: " + today);
 		JTextField todayField = new JTextField(today.toString());
 		plannerFrame.add(todayField, BorderLayout.PAGE_END);
-
 	}
 	
 	//method to update month 
