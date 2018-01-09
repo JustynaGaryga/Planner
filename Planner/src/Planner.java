@@ -3,6 +3,7 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -44,8 +45,10 @@ import javax.swing.table.DefaultTableModel;
 
 public class Planner extends JFrame {
 	JFrame plannerFrame = new JFrame("Planner. Learn IT, Girl!");
-	DefaultTableModel model;
 	Calendar cal = new GregorianCalendar(Locale.ENGLISH);
+	String month;
+	int year;
+	DefaultTableModel model;
 	JPanel listPanel = new JPanel();
 	JPanel topPanel = new JPanel();
 	JPanel buttonPanel = new JPanel();
@@ -118,8 +121,6 @@ public class Planner extends JFrame {
 		JList listWithDaysE = new JList(dayListE);
 		for (int i = 1; i <= 31; i++) {
 			dayListS.addElement(String.format("%02d", i));
-		}
-		for (int i = 1; i <= 31; i++) {
 			dayListE.addElement(String.format("%02d", i));
 		}
 		
@@ -129,8 +130,6 @@ public class Planner extends JFrame {
 		JList listWithMonthE = new JList(monthListE);
 		for (int i = 1; i <= 12; i++) {
 			monthListS.addElement(String.format("%02d", i));
-		}
-		for (int i = 1; i <= 12; i++) {
 			monthListE.addElement(String.format("%02d", i));
 		}
 		
@@ -140,8 +139,6 @@ public class Planner extends JFrame {
 		JList listWithYearE = new JList(yearListE);
 		for (int i = 2018; i < 2040; i++) {
 			yearListS.addElement(String.format("%02d", i));
-		}
-		for (int i = 2018; i < 2040; i++) {
 			yearListE.addElement(String.format("%02d", i));
 		}
 		
@@ -151,8 +148,6 @@ public class Planner extends JFrame {
 		JList listWithHourE = new JList(hourListE);
 		for (int i = 0; i <= 24; i++) {
 			hourListS.addElement(String.format("%02d", i));
-		}
-		for (int i = 0; i <= 24; i++) {
 			hourListE.addElement(String.format("%02d", i));
 		}
 		
@@ -162,8 +157,6 @@ public class Planner extends JFrame {
 		JList listWithMinuteE = new JList(minuteListE);
 		for (int i = 0; i <= 60 ; i++) {
 			minuteListS.addElement(String.format("%02d", i));
-		}
-		for (int i = 0; i <= 60 ; i++) {
 			minuteListE.addElement(String.format("%02d", i));
 		}
 		
@@ -371,7 +364,7 @@ public class Planner extends JFrame {
 			      // save tasks repeatable monthly
 			         if (repeatableMonthly.isSelected()) {
 						int month = taskCreated.getStartTime().getMonth();
-						for (int i = 1; i <= 12; i++) {
+						for (int i = 1; i <= 12 - month; i++) {
 							Task t = new Task(taskName.getText(), taskDescription.getText()); 
 							Date startDate = taskCreated.getStartTime();
 							startDate.setMonth(month + i);
@@ -450,16 +443,19 @@ public class Planner extends JFrame {
 		*/
 		// Tasks that want to use the application and don't have a database yet can use this code to have a working version
 		
-	    // list with today's tasks 
+	    // list with today's tasks - fix that!!!!
 	    DefaultComboBoxModel<Task> tasksToday = new DefaultComboBoxModel<>();
 	 	JList listWithTasksToday= new JList(tasksToday);
-	    ArrayList<Task> tasksTod = TaskDAO.getTasks(users);
+	    ArrayList<Task> tasksTod = new ArrayList<Task>();
 	    for (Task t : tasks) {
- 			if (t.getStartTime().equals(today)) {
- 			tasksToday.addElement(t);
- 			}
+	    	Date firstDate = CellRenderer.getZeroTimeDate(t.getStartTime());
+	    	Date secondDate = CellRenderer.getZeroTimeDate(today);
+	    	if (firstDate.equals(secondDate)) {
+	    		tasksToday.addElement(t);
+	    	}
 	    }	
-	 	System.out.println(tasksTod.toString());
+	    System.out.println("=============================================================================== ");
+	 	System.out.println(tasksToday.toString());
 	 		
 	    
 		Border border = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
@@ -754,20 +750,44 @@ public class Planner extends JFrame {
 		int rowCount = 5;
 		model.setRowCount(rowCount);
 		
+		// cells renderer 
+		calendar.setDefaultRenderer(Object.class, new CellRenderer(tasks, cal));
+		
+		// cells listeners
 		ListSelectionModel cellSelectionModel = calendar.getSelectionModel();
-
 	    cellSelectionModel.addListSelectionListener(new ListSelectionListener() {
-	      public void valueChanged(ListSelectionEvent e) {
-	        Integer selectedData = null;
-
-	        int selectedRow = calendar.getSelectedRow();
-	        int selectedColumn = calendar.getSelectedColumn();
-
-	        selectedData = (Integer) calendar.getValueAt(selectedRow, selectedColumn);
-	      
-	        System.out.println("Selected: " + selectedData);
+	    	public void valueChanged(ListSelectionEvent e) {
+	    	  	if (!e.getValueIsAdjusting()) {
+	    	  		Integer selectedData = null;
+	    	  		int selectedRow = calendar.getSelectedRow();
+	    	  		int selectedColumn = calendar.getSelectedColumn();
+	    	  		System.out.println("first listener");
+	    	  		System.out.println("first listener row " + selectedRow);
+	    	  		System.out.println("first listner column " + selectedColumn);
+	    	  		if (selectedRow != -1 && selectedColumn != -1) {
+		        		selectedData = (Integer) calendar.getValueAt(selectedRow, selectedColumn);
+	    			}
+	    	  		System.out.println("Selected: " + selectedData);
+ 	    	}
 	      }
+	    });
 
+	    calendar.getColumnModel().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+	    	public void valueChanged(ListSelectionEvent e) {
+	    		if (!e.getValueIsAdjusting()) {
+	    			Integer selectedData = null;
+	    			int selectedRow = calendar.getSelectedRow();
+	    			int selectedColumn = calendar.getSelectedColumn();
+	    			System.out.println("Second listener");
+	    			System.out.println("second listener row " + selectedRow);
+	    			System.out.println("second listner column " + selectedColumn);
+	    			if (selectedRow != -1 && selectedColumn != -1) {
+		        		selectedData = (Integer) calendar.getValueAt(selectedRow, selectedColumn);
+	    			}
+		        System.out.println("Selected: " + selectedData);
+	    		}
+
+		     }
 	    });
 		
 		// last month
@@ -799,18 +819,20 @@ public class Planner extends JFrame {
 		plannerFrame.add(calPanel);
 		
 		this.updateMonth();
-
+		
+		// display today's date
 		System.out.println("Today is: " + today);
 		JTextField todayField = new JTextField(today.toString());
 		plannerFrame.add(todayField, BorderLayout.PAGE_END);
 	}
 	
+	
 	//method to update month 
 	void updateMonth() {
 		cal.set(Calendar.DAY_OF_MONTH, 1);
 		     
-		String month = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.US);
-		int year = cal.get(Calendar.YEAR);
+		month = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.US);
+		year = cal.get(Calendar.YEAR);
 		monthLabel.setText(month + " " + year);
 		     
 		int startDay = cal.get(Calendar.DAY_OF_WEEK);
