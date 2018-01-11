@@ -23,7 +23,7 @@ import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-class ListListener implements ListSelectionListener {
+class ListTaskListener implements ListSelectionListener  {
 
 	DefaultComboBoxModel<User> usersList = new DefaultComboBoxModel<>();
 	DefaultComboBoxModel<Task> tasksList = new DefaultComboBoxModel<>();

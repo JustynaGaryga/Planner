@@ -28,9 +28,9 @@ class CellRenderer implements TableCellRenderer {
     DefaultComboBoxModel<Task> cellTasks;
 
     public CellRenderer(ArrayList<Task> tasks, Calendar cal) {
-        textArea = new JTextArea();
         cellTasks = new DefaultComboBoxModel<>();
         taskList = new JList(cellTasks);
+        textArea = new JTextArea();
         panel = new JPanel();
         panel.add(textArea);
         panel.add(taskList);
@@ -66,7 +66,7 @@ class CellRenderer implements TableCellRenderer {
     	Date firstDate = getZeroTimeDate(cellDate);
     	Date secondDate = getZeroTimeDate(today);
     	if (firstDate.equals(secondDate)) {
-    		foreground = Color.YELLOW;
+    		foreground = Color.RED;
     		background = Color.GREEN;
     		System.out.println("Is that equal?");
     	}
@@ -83,7 +83,7 @@ class CellRenderer implements TableCellRenderer {
     renderer.setBackground(background);
     return renderer;
    
-  /*
+    /*
     if(null != value)
         textArea.setText(value.toString());
 

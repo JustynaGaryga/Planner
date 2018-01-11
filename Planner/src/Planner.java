@@ -89,6 +89,31 @@ public class Planner extends JFrame {
 		}
 		System.out.println(tasks.toString());
 		
+		// button for adding new users - it WORKS
+		AddNewUser newUser = new AddNewUser();
+		addUserButton.addActionListener(newUser);
+		
+		// button for adding new task
+		AddNewTask newTask = new AddNewTask();
+		addTaskButton.addActionListener(newTask);
+		
+		// add buttons to panelButtons
+		buttonPanel.add(addUserButton);
+		buttonPanel.add(addTaskButton);
+		buttonPanel.setSize(200, 200);
+		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+		
+		// show a dialog for edit user, when we click on the user- does not WORK
+		ListUserListener listListenerU = new ListUserListener();
+		listWithUsers.addListSelectionListener(listListenerU);
+		
+		// show a dialog for edit task, when we click on the task- does not WORK
+		ListTaskListener listListenerT = new ListTaskListener();
+		listWithTasks.addListSelectionListener(listListenerT);
+		
+		
+				
+		/*
 		// button for adding new users
 		addUserButton.addActionListener(new ActionListener() {
 			@Override
@@ -113,7 +138,9 @@ public class Planner extends JFrame {
 			         User userCreated = UserDAO.insertUser(newUser);
 			         usersList.addElement(userCreated);
 			    }}});
+		*/
 		
+		/*
 		// lists with years, months, days, hours and minutes- JComboBoxes in dialog for adding a new task
 		DefaultComboBoxModel<String> dayListS = new DefaultComboBoxModel<>();
 		DefaultComboBoxModel<String> dayListE = new DefaultComboBoxModel<>();
@@ -377,7 +404,7 @@ public class Planner extends JFrame {
 						}
 					}
 			    }}});
-		
+		*/
 		// click on button 
 		selectTaskButton.addActionListener(new ActionListener() {
 			@Override
@@ -405,11 +432,7 @@ public class Planner extends JFrame {
 			    
 			    }}});
 				
-		// add buttons to panelButtons
-		buttonPanel.add(addUserButton);
-	    buttonPanel.add(addTaskButton);
-	    buttonPanel.setSize(200, 200);
-	    buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+		
 		
 		/*User's list
 		User user1 = new User("Justyna", "Garyga");
@@ -443,7 +466,7 @@ public class Planner extends JFrame {
 		*/
 		// Tasks that want to use the application and don't have a database yet can use this code to have a working version
 		
-	    // list with today's tasks - fix that!!!!
+	    // list with today's tasks
 	    DefaultComboBoxModel<Task> tasksToday = new DefaultComboBoxModel<>();
 	 	JList listWithTasksToday= new JList(tasksToday);
 	    ArrayList<Task> tasksTod = new ArrayList<Task>();
@@ -482,6 +505,7 @@ public class Planner extends JFrame {
 		plannerFrame.add(topPanel, BorderLayout.PAGE_START);
 		plannerFrame.add(listPanel, BorderLayout.LINE_START); 
 		
+		/*
 		// show a JFrame for edit user, when we click on the user in User's list
 		listWithUsers.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent evtU) {
@@ -593,11 +617,13 @@ public class Planner extends JFrame {
 				});
 			}
 		});
+		*/
 		
+		/*
 		// show a dialog for edit task, when we click on the task
 		listWithTasks.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent evtT) {
-				//JFrame to edit User
+				//JFrame to edit tasks
 				JFrame editTaskFrame = new JFrame("Edit the task");
 				editTaskFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); //clicking on X - do nothing
 				editTaskFrame.setSize(350, 350);
@@ -733,7 +759,7 @@ public class Planner extends JFrame {
 			    System.out.println("Selected from " + evtT.getFirstIndex() + " to " + evtT.getLastIndex());	 
 			}
 		});	
-		
+		*/
 		// JTable for calendar
 		String[] columnNames = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 		
@@ -789,7 +815,10 @@ public class Planner extends JFrame {
 
 		     }
 	    });
-		
+	    
+		CellListener cellListen = new CellListener();
+	    cellSelectionModel.addListSelectionListener(cellListen);  // here is something wrong with choosing the cells
+	    
 		// last month
 		JButton buttonLow = new JButton("<-");
 			buttonLow.addActionListener(new ActionListener() {
@@ -849,6 +878,7 @@ public class Planner extends JFrame {
 		}
 	}     
 	
+	/*
 	// method to set the OK button enabled- JFrame to edit users
 	void enableOKButtonUser (JTextField userName, JTextField userSurname, JButton okButton) {
 		if (userName.getText().length() == 0 || userSurname.getText().length() == 0) {
@@ -857,7 +887,8 @@ public class Planner extends JFrame {
 			okButton.setEnabled(true);
 		}
 	}
-	
+	*/
+	/*
 	// method to set the OK button enabled- JFrame to edit tasks
 	void enableOKButtonTask (JTextField taskName, JTextField taskDescription, JTextField start, JTextField end, JButton okButton) {
 		if (taskName.getText().length() == 0 || taskDescription.getText().length() == 0
@@ -867,4 +898,5 @@ public class Planner extends JFrame {
     		okButton.setEnabled(true);
     	}
 	}
+	*/
 }
