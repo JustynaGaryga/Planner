@@ -17,21 +17,22 @@ import javax.swing.JTextField;
 
 public class AddNewTask implements ActionListener {
 	
-	DefaultComboBoxModel<User> usersList = new DefaultComboBoxModel<>();
-	DefaultComboBoxModel<Task> tasksList = new DefaultComboBoxModel<>();
-	JList listWithUsers = new JList(usersList);
-	JList listWithTasks = new JList(tasksList);
+	DefaultComboBoxModel<User> usersList;
+	ArrayList<Task> tasks;
 	ArrayList<User> users;
+	DefaultComboBoxModel<Task> tasksToday;
+	
+	public AddNewTask(DefaultComboBoxModel<User> usersList, ArrayList<Task> tasks, ArrayList<User> users, DefaultComboBoxModel<Task> tasksToday) {
+		this.usersList= usersList;
+		this.tasks= tasks;
+		this.users= users;
+		this.tasksToday= tasksToday;
+	}
 	
 	// button for adding new task
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-	
-		users = UserDAO.getUsers();
-		for (User u : users) {
-			usersList.addElement(u);
-		}
-		
+
 		// lists with years, months, days, hours and minutes- JComboBoxes in dialog for adding a new task
 		DefaultComboBoxModel<String> dayListS = new DefaultComboBoxModel<>();
 		DefaultComboBoxModel<String> dayListE = new DefaultComboBoxModel<>();
@@ -64,7 +65,7 @@ public class AddNewTask implements ActionListener {
 		DefaultComboBoxModel<String> hourListE = new DefaultComboBoxModel<>();
 		JList listWithHourS = new JList(hourListS);
 		JList listWithHourE = new JList(hourListE);
-		for (int i = 0; i <= 24; i++) {
+		for (int i = 0; i < 24; i++) {
 			hourListS.addElement(String.format("%02d", i));
 			hourListE.addElement(String.format("%02d", i));
 		}
@@ -78,7 +79,6 @@ public class AddNewTask implements ActionListener {
 			minuteListE.addElement(String.format("%02d", i));
 		}
 	
-		JComboBox selectTask = new JComboBox(tasksList);
 		JComboBox assignedTo = new JComboBox(usersList);
 	    JComboBox dayStart = new JComboBox(dayListS);
 	    JComboBox monthStart = new JComboBox(monthListS);
@@ -107,17 +107,17 @@ public class AddNewTask implements ActionListener {
 		yearStart.setSelectedItem(Calendar.getInstance().get(Calendar.YEAR));
 		monthStart.setSelectedIndex(Calendar.getInstance().get(Calendar.MONTH));
 		dayStart.setSelectedIndex(Calendar.getInstance().get(Calendar.DAY_OF_MONTH) - 1);
-		hourStart.setSelectedIndex(Calendar.getInstance().get(Calendar.HOUR));
+		hourStart.setSelectedIndex(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
 		minuteStart.setSelectedIndex(Calendar.getInstance().get(Calendar.MINUTE));
 		yearEnd.setSelectedItem(Calendar.getInstance().get(Calendar.YEAR));
 		monthEnd.setSelectedIndex(Calendar.getInstance().get(Calendar.MONTH));
 		dayEnd.setSelectedIndex(Calendar.getInstance().get(Calendar.DAY_OF_MONTH) - 1);
-		hourEnd.setSelectedIndex(Calendar.getInstance().get(Calendar.HOUR));
+		hourEnd.setSelectedIndex(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
 		minuteEnd.setSelectedIndex(Calendar.getInstance().get(Calendar.MINUTE));
 		System.out.println(Calendar.getInstance().get(Calendar.YEAR));
 		System.out.println(Calendar.getInstance().get(Calendar.MONTH));
 		System.out.println(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
-		    
+		System.out.println("Hour " + Calendar.getInstance().get(Calendar.HOUR_OF_DAY));   
 		// display the date from JComboBoxes in the JTextFields
 		start.setText(yearStart.getSelectedItem().toString() + "-" + monthStart.getSelectedItem().toString() + "-" + 
 			dayStart.getSelectedItem().toString() + " " + hourStart.getSelectedItem().toString() + ":" + minuteStart.getSelectedItem().toString() + ":00");		    
@@ -246,7 +246,14 @@ public class AddNewTask implements ActionListener {
 			System.out.println("Start: " + taskCreated.getStartTime());
 			System.out.println("End: " + taskCreated.getEndTime());
 			System.out.println("Assigned to: " + taskCreated.getAssignedTo());
-			tasksList.addElement(taskCreated);
+			tasks.add(taskCreated);
+			Date today = Calendar.getInstance().getTime();
+			Date firstDate = CellRenderer.getZeroTimeDate(taskCreated.getStartTime());
+		    Date secondDate = CellRenderer.getZeroTimeDate(today);
+		    if (firstDate.equals(secondDate)) {
+		    	System.out.println("Today's task");
+	    		tasksToday.addElement(taskCreated);
+	    	}
 			
 			// save tasks repeatable yearly
 			if (repeatableEachYear.isSelected()) {

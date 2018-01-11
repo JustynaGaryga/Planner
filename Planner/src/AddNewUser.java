@@ -11,7 +11,11 @@ import javax.swing.JTextField;
 
 public class AddNewUser implements ActionListener {
 	
-	DefaultComboBoxModel<User> usersList = new DefaultComboBoxModel<>();
+	DefaultComboBoxModel<User> usersList;
+	
+	public AddNewUser(DefaultComboBoxModel<User> usersList) {
+		this.usersList= usersList;
+	}
 	
 	// button for adding new users
 	public void actionPerformed(ActionEvent arg0) {

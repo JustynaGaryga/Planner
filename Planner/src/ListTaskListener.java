@@ -25,20 +25,21 @@ import javax.swing.event.ListSelectionListener;
 
 class ListTaskListener implements ListSelectionListener  {
 
-	DefaultComboBoxModel<User> usersList = new DefaultComboBoxModel<>();
-	DefaultComboBoxModel<Task> tasksList = new DefaultComboBoxModel<>();
-	JList listWithUsers = new JList(usersList);
-	JList listWithTasks = new JList(tasksList);
+	DefaultComboBoxModel<User> usersList;
+	DefaultComboBoxModel<Task> tasksList;
+	JList listWithTasks;
 	ArrayList<User> users;
+	
+	public ListTaskListener(DefaultComboBoxModel<User> usersList, DefaultComboBoxModel<Task> tasksList, JList listWithTasks, ArrayList<User> users) {
+		this.usersList= usersList;
+		this.tasksList= tasksList;
+		this.listWithTasks= listWithTasks;
+		this.users= users;
+	}
 	
 	@Override		
 	// show a dialog for edit task, when we click on the task	 
 	public void valueChanged(ListSelectionEvent evtT) {
-		
-		users = UserDAO.getUsers();
-		for (User u : users) {
-			usersList.addElement(u);
-		}
 		
 		//JFrame to edit tasks
 		JFrame editTaskFrame = new JFrame("Edit the task");

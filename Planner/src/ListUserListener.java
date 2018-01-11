@@ -23,20 +23,17 @@ import javax.swing.event.ListSelectionListener;
 
 public class ListUserListener implements ListSelectionListener {
 
-	DefaultComboBoxModel<User> usersList = new DefaultComboBoxModel<>();
-	DefaultComboBoxModel<Task> tasksList = new DefaultComboBoxModel<>();
-	JList listWithUsers = new JList(usersList);
-	JList listWithTasks = new JList(tasksList);
-	ArrayList<User> users;
+	DefaultComboBoxModel<User> usersList;
+	JList listWithUsers;
+	
+	public ListUserListener(DefaultComboBoxModel<User> usersList,JList listWithUsers) {
+		this.usersList= usersList;
+		this.listWithUsers= listWithUsers;
+	}
 	
 	// show a JFrame for edit user, when we click on the user in User's list
 	
 	public void valueChanged(ListSelectionEvent evtU) {
-		
-		users = UserDAO.getUsers();
-		for (User u : users) {
-			usersList.addElement(u);
-		}
 		
 		//JFrame to edit User
 		JFrame editUserFrame = new JFrame("Edit the User");

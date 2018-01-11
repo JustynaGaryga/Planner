@@ -35,11 +35,6 @@ class ListListener implements ListSelectionListener {
 	// show a dialog for edit task, when we click on the task	 
 	public void valueChanged(ListSelectionEvent evtT) {
 		
-		users = UserDAO.getUsers();
-		for (User u : users) {
-			usersList.addElement(u);
-		}
-		
 		//JFrame to edit tasks
 		JFrame editTaskFrame = new JFrame("Edit the task");
 		editTaskFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); //clicking on X - do nothing
