@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -41,16 +42,71 @@ class ListTaskListener implements ListSelectionListener  {
 	// show a dialog for edit task, when we click on the task	 
 	public void valueChanged(ListSelectionEvent evtT) {
 		
+		// lists with years, months, days, hours and minutes- JComboBoxes in dialog for adding a new task
+		DefaultComboBoxModel<String> dayListS = new DefaultComboBoxModel<>();
+		DefaultComboBoxModel<String> dayListE = new DefaultComboBoxModel<>();
+		JList listWithDayS = new JList(dayListS);
+		JList listWithDaysE = new JList(dayListE);
+		for (int i = 1; i <= 31; i++) {
+			dayListS.addElement(String.format("%02d", i));
+			dayListE.addElement(String.format("%02d", i));
+		}
+		
+		DefaultComboBoxModel<String> monthListS = new DefaultComboBoxModel<>();
+		DefaultComboBoxModel<String> monthListE = new DefaultComboBoxModel<>();
+		JList listWithMonthS = new JList(monthListS);
+		JList listWithMonthE = new JList(monthListE);
+		for (int i = 1; i <= 12; i++) {
+			monthListS.addElement(String.format("%02d", i));
+			monthListE.addElement(String.format("%02d", i));
+		}
+					
+		DefaultComboBoxModel<String> yearListS = new DefaultComboBoxModel<>();
+		DefaultComboBoxModel<String> yearListE = new DefaultComboBoxModel<>();
+		JList listWithYearS = new JList(yearListS);
+		JList listWithYearE = new JList(yearListE);
+		for (int i = Calendar.getInstance().get(Calendar.YEAR); i < Calendar.getInstance().get(Calendar.YEAR) + 20; i++) {
+			yearListS.addElement(String.format("%02d", i));
+			yearListE.addElement(String.format("%02d", i));
+		}
+				
+		DefaultComboBoxModel<String> hourListS = new DefaultComboBoxModel<>();
+		DefaultComboBoxModel<String> hourListE = new DefaultComboBoxModel<>();
+		JList listWithHourS = new JList(hourListS);
+		JList listWithHourE = new JList(hourListE);
+		for (int i = 0; i < 24; i++) {
+			hourListS.addElement(String.format("%02d", i));
+			hourListE.addElement(String.format("%02d", i));
+		}
+					
+		DefaultComboBoxModel<String> minuteListS = new DefaultComboBoxModel<>();
+		DefaultComboBoxModel<String> minuteListE = new DefaultComboBoxModel<>();
+		JList listWithMinuteS = new JList(minuteListS);
+		JList listWithMinuteE = new JList(minuteListE);
+		for (int i = 0; i < 60 ; i++) {
+			minuteListS.addElement(String.format("%02d", i));
+			minuteListE.addElement(String.format("%02d", i));
+		}
+		
 		//JFrame to edit tasks
 		JFrame editTaskFrame = new JFrame("Edit the task");
 		editTaskFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); //clicking on X - do nothing
-		editTaskFrame.setSize(350, 350);
+		editTaskFrame.setSize(350, 400);
 		editTaskFrame.setLocation(600, 200);
 		JComboBox selectTask = new JComboBox(tasksList);
 		JComboBox assignedTo = new JComboBox(usersList);
+		JComboBox dayStart = new JComboBox(dayListS);
+		JComboBox monthStart = new JComboBox(monthListS);
+		JComboBox yearStart = new JComboBox(yearListS);
+		JComboBox hourStart = new JComboBox(hourListS);
+		JComboBox minuteStart = new JComboBox(minuteListS);
+		JComboBox dayEnd = new JComboBox(dayListE);
+		JComboBox monthEnd = new JComboBox(monthListE);
+		JComboBox yearEnd = new JComboBox(yearListE);
+		JComboBox hourEnd = new JComboBox(hourListE);
+		JComboBox minuteEnd = new JComboBox(minuteListE);
 		JTextField taskName = new JTextField(25);
 		JTextField taskDescription = new JTextField(30);
-		JCheckBox repeatableEachYear = new JCheckBox("Repeatable each year");
 		JTextField start = new JTextField(30);
 		JTextField end = new JTextField(30);
 		JPanel okCancelPanel = new JPanel();
@@ -59,7 +115,25 @@ class ListTaskListener implements ListSelectionListener  {
 		JButton cancelButton = new JButton("Cancel");
 		Task editTask = (Task)listWithTasks.getSelectedValue();
 		JPanel taskPanel = new JPanel();
-				
+		JPanel datePanelStart = new JPanel();
+	    JPanel datePanelEnd = new JPanel();
+
+		start.setEditable(false);
+		end.setEditable(false);
+		
+		// create the panels with the JComboBoxes (start and end date)
+		datePanelStart.add(yearStart);
+		datePanelStart.add(monthStart);
+		datePanelStart.add(dayStart);
+		datePanelStart.add(hourStart);
+		datePanelStart.add(minuteStart);
+		
+		datePanelEnd.add(yearEnd);
+		datePanelEnd.add(monthEnd);
+		datePanelEnd.add(dayEnd);
+		datePanelEnd.add(hourEnd);
+		datePanelEnd.add(minuteEnd);
+		
 		if (listWithTasks.getSelectedValue() != null) {
 			taskName.setText(((Task)listWithTasks.getSelectedValue()).getNameTask());
 			taskDescription.setText(((Task)listWithTasks.getSelectedValue()).getDescriptionTask());
@@ -70,8 +144,82 @@ class ListTaskListener implements ListSelectionListener  {
 			start.setText(startFormatted);
 			end.setText(endFormatted);
 			assignedTo.setSelectedItem(((Task)listWithTasks.getSelectedValue()).getAssignedTo());
+			
+			// listeners for JComboBoxes- start time
+			yearStart.addActionListener(
+				new ActionListener(){
+					public void actionPerformed(ActionEvent e){
+						start.setText(yearStart.getSelectedItem().toString() + "-" + monthStart.getSelectedItem().toString() + "-" + 
+								dayStart.getSelectedItem().toString() + " " + hourStart.getSelectedItem().toString() + ":" + minuteStart.getSelectedItem().toString() + ":00");
+					}
+				});
+			monthStart.addActionListener(
+				new ActionListener(){
+					public void actionPerformed(ActionEvent e){
+						start.setText(yearStart.getSelectedItem().toString() + "-" + monthStart.getSelectedItem().toString() + "-" + 
+								dayStart.getSelectedItem().toString() + " " + hourStart.getSelectedItem().toString() + ":" + minuteStart.getSelectedItem().toString() + ":00");
+					}
+				});
+			dayStart.addActionListener(
+				new ActionListener(){
+					public void actionPerformed(ActionEvent e){
+						start.setText(yearStart.getSelectedItem().toString() + "-" + monthStart.getSelectedItem().toString() + "-" + 
+								dayStart.getSelectedItem().toString() + " " + hourStart.getSelectedItem().toString() + ":" + minuteStart.getSelectedItem().toString() + ":00");
+					}
+				});
+			hourStart.addActionListener(
+				new ActionListener(){
+					public void actionPerformed(ActionEvent e){
+						start.setText(yearStart.getSelectedItem().toString() + "-" + monthStart.getSelectedItem().toString() + "-" + 
+								dayStart.getSelectedItem().toString() + " " + hourStart.getSelectedItem().toString() + ":" + minuteStart.getSelectedItem().toString() + ":00");
+					}	
+				});
+			minuteStart.addActionListener(
+				new ActionListener(){
+					public void actionPerformed(ActionEvent e){
+						start.setText(yearStart.getSelectedItem().toString() + "-" + monthStart.getSelectedItem().toString() + "-" + 
+								dayStart.getSelectedItem().toString() + " " + hourStart.getSelectedItem().toString() + ":" + minuteStart.getSelectedItem().toString() + ":00");
+					}
+				});
+							    
+			// listeners for JComboBoxes- end time
+			yearEnd.addActionListener(
+				new ActionListener(){
+					public void actionPerformed(ActionEvent e){
+						end.setText(yearEnd.getSelectedItem().toString() + "-" + monthEnd.getSelectedItem().toString() + "-" + 
+								dayEnd.getSelectedItem().toString() + " " + hourEnd.getSelectedItem().toString() + ":" + minuteEnd.getSelectedItem().toString() + ":00");
+					}
+				});
+			monthEnd.addActionListener(
+				new ActionListener(){
+					public void actionPerformed(ActionEvent e){
+						end.setText(yearEnd.getSelectedItem().toString() + "-" + monthEnd.getSelectedItem().toString() + "-" + 
+								dayEnd.getSelectedItem().toString() + " " + hourEnd.getSelectedItem().toString() + ":" + minuteEnd.getSelectedItem().toString() + ":00");
+					}
+						});
+			dayEnd.addActionListener(
+				new ActionListener(){
+					public void actionPerformed(ActionEvent e){
+						end.setText(yearEnd.getSelectedItem().toString() + "-" + monthEnd.getSelectedItem().toString() + "-" + 
+								dayEnd.getSelectedItem().toString() + " " + hourEnd.getSelectedItem().toString() + ":" + minuteEnd.getSelectedItem().toString() + ":00");
+					}
+				});
+			hourEnd.addActionListener(
+				new ActionListener(){
+					public void actionPerformed(ActionEvent e){
+						end.setText(yearEnd.getSelectedItem().toString() + "-" + monthEnd.getSelectedItem().toString() + "-" + 
+								dayEnd.getSelectedItem().toString() + " " + hourEnd.getSelectedItem().toString() + ":" + minuteEnd.getSelectedItem().toString() + ":00");
+					}	
+				});
+			minuteEnd.addActionListener(
+				new ActionListener(){
+					public void actionPerformed(ActionEvent e){
+						end.setText(yearEnd.getSelectedItem().toString() + "-" + monthEnd.getSelectedItem().toString() + "-" + 
+								dayEnd.getSelectedItem().toString() + " " + hourEnd.getSelectedItem().toString() + ":" + minuteEnd.getSelectedItem().toString() + ":00");
+					}	
+				});
 		}
-						
+							
 		taskPanel.add(new JLabel("Edit name of task:"));
 		taskPanel.add(taskName);
 		taskPanel.add(Box.createVerticalStrut(15)); // a spacer
@@ -79,12 +227,13 @@ class ListTaskListener implements ListSelectionListener  {
 		taskPanel.add(taskDescription);
 		taskPanel.add(new JLabel("Choose the user:"));
 		taskPanel.add(assignedTo);
-		taskPanel.add(new JLabel("Edit start time. Enter yyyy-MM-dd HH:mm:ss")); 
-		taskPanel.add(start); // change to field where user can select the date and time
-		taskPanel.add(new JLabel("Edit end time. Enter yyyy-MM-dd HH:mm:ss"));
-		taskPanel.add(end); // change to field where user can select the date and time
+		taskPanel.add(new JLabel("Start time: ")); 
+		taskPanel.add(start); 
+		taskPanel.add(datePanelStart);
+		taskPanel.add(new JLabel("End time: "));
+		taskPanel.add(end);
+		taskPanel.add(datePanelEnd);
 		taskPanel.add(deleteTask);
-		taskPanel.add(repeatableEachYear);
 
 		okButton.setEnabled(false);
 		cancelButton.setEnabled(true);

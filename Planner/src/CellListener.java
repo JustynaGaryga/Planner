@@ -65,7 +65,7 @@ public class CellListener implements ListSelectionListener {
 		DefaultComboBoxModel<String> yearListE = new DefaultComboBoxModel<>();
 		JList listWithYearS = new JList(yearListS);
 		JList listWithYearE = new JList(yearListE);
-		for (int i = 2018; i < 2040; i++) {
+		for (int i = Calendar.getInstance().get(Calendar.YEAR); i < Calendar.getInstance().get(Calendar.YEAR) + 20; i++) {
 			yearListS.addElement(String.format("%02d", i));
 			yearListE.addElement(String.format("%02d", i));
 		}
@@ -74,7 +74,7 @@ public class CellListener implements ListSelectionListener {
 		DefaultComboBoxModel<String> hourListE = new DefaultComboBoxModel<>();
 		JList listWithHourS = new JList(hourListS);
 		JList listWithHourE = new JList(hourListE);
-		for (int i = 0; i <= 24; i++) {
+		for (int i = 0; i < 24; i++) {
 			hourListS.addElement(String.format("%02d", i));
 			hourListE.addElement(String.format("%02d", i));
 		}
@@ -83,7 +83,7 @@ public class CellListener implements ListSelectionListener {
 		DefaultComboBoxModel<String> minuteListE = new DefaultComboBoxModel<>();
 		JList listWithMinuteS = new JList(minuteListS);
 		JList listWithMinuteE = new JList(minuteListE);
-		for (int i = 0; i <= 60 ; i++) {
+		for (int i = 0; i < 60 ; i++) {
 			minuteListS.addElement(String.format("%02d", i));
 			minuteListE.addElement(String.format("%02d", i));
 		}
@@ -106,6 +106,7 @@ public class CellListener implements ListSelectionListener {
 	    JTextField taskDescription = new JTextField(30);
 	    JCheckBox repeatableEachYear = new JCheckBox("Repeatable yearly");
 	    JCheckBox repeatableMonthly = new JCheckBox("Repeatable monthly");
+	    JList listWithTasksToday = new JList(tasksToday);
 	    JPanel taskPanel = new JPanel();
 	    JPanel datePanelStart = new JPanel();
 	    JPanel datePanelEnd = new JPanel();
@@ -129,7 +130,6 @@ public class CellListener implements ListSelectionListener {
 		//create the panel for tasks
 		taskPanel.add(new JLabel("Name of task:"));
 		taskPanel.add(taskName);
-		taskPanel.add(Box.createVerticalStrut(15)); // a spacer
 		taskPanel.add(new JLabel("Description of task:"));
 		taskPanel.add(taskDescription);
 		taskPanel.add(new JLabel("Choose the user:"));
@@ -142,6 +142,9 @@ public class CellListener implements ListSelectionListener {
 		taskPanel.add(datePanelEnd);
 		taskPanel.add(repeatableEachYear);
 		taskPanel.add(repeatableMonthly);
+		taskPanel.add(Box.createVerticalStrut(15));
+		taskPanel.add(new JLabel("Today's tasks: "));
+		taskPanel.add(listWithTasksToday); // problem with today's date
 		taskPanel.setLayout(new BoxLayout(taskPanel, BoxLayout.Y_AXIS));
 		
 		// listeners for JComboBoxes- start time
@@ -277,7 +280,7 @@ public class CellListener implements ListSelectionListener {
         		    	System.out.println("Today's task");
         	    		tasksToday.addElement(taskCreated);
         		    }
-        		    
+        		      
         			// save tasks repeatable yearly
         			if (repeatableEachYear.isSelected()) {
         				int yearRepeatable = taskCreated.getStartTime().getYear();

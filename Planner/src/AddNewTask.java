@@ -56,7 +56,7 @@ public class AddNewTask implements ActionListener {
 		DefaultComboBoxModel<String> yearListE = new DefaultComboBoxModel<>();
 		JList listWithYearS = new JList(yearListS);
 		JList listWithYearE = new JList(yearListE);
-		for (int i = 2018; i < 2040; i++) {
+		for (int i = Calendar.getInstance().get(Calendar.YEAR); i < Calendar.getInstance().get(Calendar.YEAR) + 20; i++) {
 			 yearListS.addElement(String.format("%02d", i));
 			 yearListE.addElement(String.format("%02d", i));
 		}
@@ -74,7 +74,7 @@ public class AddNewTask implements ActionListener {
 		DefaultComboBoxModel<String> minuteListE = new DefaultComboBoxModel<>();
 		JList listWithMinuteS = new JList(minuteListS);
 		JList listWithMinuteE = new JList(minuteListE);
-		for (int i = 0; i <= 60 ; i++) {
+		for (int i = 0; i < 60 ; i++) {
 			minuteListS.addElement(String.format("%02d", i));
 			minuteListE.addElement(String.format("%02d", i));
 		}
