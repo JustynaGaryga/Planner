@@ -110,7 +110,6 @@ public class Planner extends JFrame {
 				tasksToday.addElement(t);
 			}
 		}	
-		System.out.println("=============================================================================== ");
 		System.out.println(tasksToday.toString());
 		
 		// list with tomorrow's tasks
@@ -239,7 +238,7 @@ public class Planner extends JFrame {
 		calendar.setDefaultRenderer(Object.class, new CellRenderer(tasks, cal));
 		
 		// cells listeners
-		CellListener cellListen = new CellListener(usersList, tasks, users, tasksToday, calendar, cal);
+		CellListener cellListen = new CellListener(usersList, tasks, users, tasksList, calendar, cal);
 		ListSelectionModel cellSelectionModel = calendar.getSelectionModel();
 	    cellSelectionModel.addListSelectionListener(cellListen);
 	    calendar.getColumnModel().getSelectionModel().addListSelectionListener(cellListen);

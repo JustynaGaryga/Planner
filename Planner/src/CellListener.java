@@ -25,15 +25,17 @@ public class CellListener implements ListSelectionListener {
 	DefaultComboBoxModel<User> usersList;
 	ArrayList<Task> tasks;
 	ArrayList<User> users;
-	DefaultComboBoxModel<Task> tasksToday;
+	DefaultComboBoxModel<Task> tasksList;
+	DefaultComboBoxModel<Task> cellTasks;
 	JTable calendar;
 	Calendar cal;
 	
-	public CellListener(DefaultComboBoxModel<User> usersList, ArrayList<Task> tasks, ArrayList<User> users, DefaultComboBoxModel<Task> tasksToday, JTable calendar, Calendar cal) {
+	public CellListener(DefaultComboBoxModel<User> usersList, ArrayList<Task> tasks, ArrayList<User> users, DefaultComboBoxModel<Task> tasksList, JTable calendar, Calendar cal) {
 		this.usersList= usersList;
 		this.tasks= tasks;
 		this.users= users;
-		this.tasksToday= tasksToday;
+		this.tasksList= tasksList;
+		this.cellTasks = new DefaultComboBoxModel<Task>();
 		this.calendar= calendar;
 		this.cal= cal;
 	}
@@ -106,7 +108,7 @@ public class CellListener implements ListSelectionListener {
 	    JTextField taskDescription = new JTextField(30);
 	    JCheckBox repeatableEachYear = new JCheckBox("Repeatable yearly");
 	    JCheckBox repeatableMonthly = new JCheckBox("Repeatable monthly");
-	    JList listWithTasksToday = new JList(tasksToday);
+	    JList listWithCellTasks = new JList(cellTasks);
 	    JPanel taskPanel = new JPanel();
 	    JPanel datePanelStart = new JPanel();
 	    JPanel datePanelEnd = new JPanel();
@@ -144,7 +146,7 @@ public class CellListener implements ListSelectionListener {
 		taskPanel.add(repeatableMonthly);
 		taskPanel.add(Box.createVerticalStrut(15));
 		taskPanel.add(new JLabel("Today's tasks: "));
-		taskPanel.add(listWithTasksToday); // problem with today's date
+		taskPanel.add(listWithCellTasks); // problem with today's date
 		taskPanel.setLayout(new BoxLayout(taskPanel, BoxLayout.Y_AXIS));
 		
 		// listeners for JComboBoxes- start time
@@ -235,6 +237,14 @@ public class CellListener implements ListSelectionListener {
         		Date cellDate = new GregorianCalendar(year, month, selectedData).getTime();
         		Calendar cellCalendar = Calendar.getInstance(); 
         		cellCalendar.setTime(cellDate); 
+        		for (Task t : tasks) {
+        			Date firstDate = CellRenderer.getZeroTimeDate(t.getStartTime());
+        		    Date secondDate = CellRenderer.getZeroTimeDate(cellDate);
+        		    if (firstDate.equals(secondDate)) {
+        		    	System.out.println("Today's task");
+        	    		cellTasks.addElement(t);
+        		    }
+        		}
         		
         		// JComboBoxes for choose the date- start with choosing date
         		yearStart.setSelectedItem(cellCalendar.get(Calendar.YEAR));
@@ -278,7 +288,7 @@ public class CellListener implements ListSelectionListener {
         		    Date secondDate = CellRenderer.getZeroTimeDate(today);
         		    if (firstDate.equals(secondDate)) {
         		    	System.out.println("Today's task");
-        	    		tasksToday.addElement(taskCreated);
+        	    		cellTasks.addElement(taskCreated);
         		    }
         		      
         			// save tasks repeatable yearly
@@ -312,6 +322,10 @@ public class CellListener implements ListSelectionListener {
         					TaskDAO.insertTask(t, users); 
         				}
         			}
+        		cellTasks.removeAllElements();
+        		}
+        		if (result == JOptionPane.CANCEL_OPTION) {
+        			cellTasks.removeAllElements();
         		}
 			}
         System.out.println("Selected: " + selectedData);
