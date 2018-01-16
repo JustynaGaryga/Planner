@@ -10,6 +10,8 @@ public class Task {
 	Date endTime;
 	User assignedTo;
 	int taskID;
+	boolean repeatableDaily;
+	static boolean repeatableEachYear;
 	
 	/**
 	 * @param nameTask
@@ -21,7 +23,6 @@ public class Task {
 		this.nameTask = nameTask;
 		this.descriptionTask = descriptionTask;
 	}
-	
 	public Task(String nameTask, String descriptionTask, Date startTime, Date endTime, User assignedTo, int taskID) {
 		super();
 		this.nameTask = nameTask;
@@ -31,6 +32,7 @@ public class Task {
 		this.assignedTo = assignedTo;
 		this.taskID = taskID;
 	}
+	
 	public String getNameTask() {
 		return nameTask;
 	}
@@ -89,5 +91,20 @@ public class Task {
 	}
 	public void setTaskID(int taskID) {
 		this.taskID = taskID;
+	}
+	public boolean isRepeatableDaily() {
+		return repeatableDaily;
+	}
+
+	public void setRepeatableDaily(boolean repeatableDaily) {
+		this.repeatableDaily = repeatableDaily;
+	}
+
+	public boolean isRepeatableEachYear() {
+		return repeatableEachYear;
+	}
+
+	public void setRepeatableEachYear(boolean repeatableEachYear) {
+		this.repeatableEachYear = repeatableEachYear;
 	}
 }

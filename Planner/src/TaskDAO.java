@@ -80,10 +80,14 @@ public class TaskDAO {
 		 
 			// Step 2: Allocate a 'Statement' object in the Connection
 			Statement stmt = conn.createStatement();
-		      
+		    
+			Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+			String startFormatted = formatter.format(t.getStartTime());
+			String endFormatted = formatter.format(t.getEndTime());
+			
 			// Step 3 & 4: Execute a SQL UPDATE via executeUpdate()
 			//   which returns an int indicating the number of rows affected.
-			String strUpdate = "update tasks set nameTask =' " + t.getNameTask() + "', descriptionTask= '" + t.getDescriptionTask() + "' where taskID=" + String.valueOf(t.getTaskID());
+			String strUpdate = "update tasks set nameTask =' " + t.getNameTask() + "', descriptionTask= '" + t.getDescriptionTask() + "', assignedTo= " + t.getAssignedTo().getId() + ", startTime= '" + startFormatted + "', endTime= '" + endFormatted + "' where taskID=" + String.valueOf(t.getTaskID());
 			System.out.println("The SQL query is: " + strUpdate);  // Echo for debugging
 			int countUpdated = stmt.executeUpdate(strUpdate);
 			System.out.println(countUpdated + " records affected.");
@@ -99,8 +103,8 @@ public class TaskDAO {
 	            Date startTime = null;
 	            Date endTime = null;
 	            try {
-	            	startTime = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(rset.getString("startTime"));
-	            	endTime = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(rset.getString("endTime"));
+	            	startTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(rset.getString("startTime"));
+	            	endTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(rset.getString("endTime"));
 	            } catch (ParseException e) {
 	            }
 	            int assignedTo = rset.getInt("assignedTo");
@@ -155,9 +159,12 @@ public class TaskDAO {
 	            Date startTime = null;
 	            Date endTime = null;
 	            try {
-	            	startTime = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(rset.getString("startTime"));
-	            	endTime = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(rset.getString("endTime"));
+	            	startTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(rset.getString("startTime"));
+	            	endTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(rset.getString("endTime"));
+	            	System.out.println("Start " + startTime);
+	            	System.out.println("End " + endTime);
 	            } catch (ParseException e) {
+	            	System.out.println(e);
 	            }
 	            int assignedTo = rset.getInt("assignedTo");
 	            int taskID = rset.getInt("taskID");

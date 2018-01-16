@@ -1,15 +1,23 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.sql.SQLException;
 import java.text.Format;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
@@ -18,6 +26,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -27,6 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
@@ -36,8 +46,10 @@ import javax.swing.table.DefaultTableModel;
 
 public class Planner extends JFrame {
 	JFrame plannerFrame = new JFrame("Planner. Learn IT, Girl!");
-	DefaultTableModel model;
 	Calendar cal = new GregorianCalendar(Locale.ENGLISH);
+	String month;
+	int year;
+	DefaultTableModel model;
 	JPanel listPanel = new JPanel();
 	JPanel topPanel = new JPanel();
 	JPanel buttonPanel = new JPanel();
@@ -45,22 +57,26 @@ public class Planner extends JFrame {
 	JPanel calPanel = new JPanel();
 	JButton addUserButton = new JButton("Add new User");
 	JButton addTaskButton = new JButton("Add new Task");
-	JButton selectTaskButton = new JButton("Choose new task");
 	JLabel userLabel = new JLabel (" USERS: ", SwingConstants.LEFT);
-	JLabel taskLabel = new JLabel (" TASKS: ", SwingConstants.LEFT);
+	JLabel taskLabel = new JLabel ("All TASKS: ", SwingConstants.LEFT);
+	JLabel taskTodayLabel = new JLabel (" Today's TASKS: ", SwingConstants.LEFT);
+	JLabel taskTomorrowLabel = new JLabel (" Tomorrow's TASKS: ", SwingConstants.LEFT);
 	JLabel monthLabel = new JLabel();
-	
+	Date today = Calendar.getInstance().getTime();
+	Date tomorrow = new Date(); 
 	DefaultComboBoxModel<User> usersList = new DefaultComboBoxModel<>();
 	DefaultComboBoxModel<Task> tasksList = new DefaultComboBoxModel<>();
+	DefaultComboBoxModel<Task> tasksToday = new DefaultComboBoxModel<>();
+	DefaultComboBoxModel<Task> tasksTomorrow = new DefaultComboBoxModel<>();
 	JList listWithUsers = new JList(usersList);
 	JList listWithTasks = new JList(tasksList);
 	
 	public Planner() {
 		super ("Planner. Learn IT, Girl!");
 		plannerFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		plannerFrame.setSize(800, 500);
+		plannerFrame.setSize(800, 600);
 		plannerFrame.setLocation(300, 50);
-		plannerFrame.getContentPane().setBackground(Color.yellow); // temporary color
+		plannerFrame.getContentPane().setBackground(Color.LIGHT_GRAY); 
 		plannerFrame.setVisible(true);
 		
 		// create the ArrayLists of users and tasks
@@ -76,106 +92,57 @@ public class Planner extends JFrame {
 		}
 		System.out.println(tasks.toString());
 		
-		//click on button 
-		addUserButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
-				JTextField userName = new JTextField(25);
-			    JTextField userSurname = new JTextField(25);
-			    JPanel userPanel = new JPanel();
-			    userPanel.add(new JLabel("Name:"));
-			    userPanel.add(userName);
-			    userPanel.add(Box.createVerticalStrut(15)); // a spacer
-			    userPanel.add(new JLabel("Surname:"));
-			    userPanel.add(userSurname);
-			    userPanel.setLayout(new BoxLayout(userPanel, BoxLayout.Y_AXIS));
-
-			    int result = JOptionPane.showConfirmDialog(null, userPanel, 
-			               "Create a new User", JOptionPane.OK_CANCEL_OPTION);
-			    if (result == JOptionPane.OK_OPTION) {
-			         System.out.println("Name: " + userName.getText());
-			         System.out.println("Surname: " + userSurname.getText());
-			         User newUser = new User(userName.getText(), userSurname.getText());
-			         User userCreated = UserDAO.insertUser(newUser);
-			         usersList.addElement(userCreated);
-			    }}});
+		// button for adding new users
+		AddNewUser newUser = new AddNewUser(usersList);
+		addUserButton.addActionListener(newUser);
 		
-		// click on button
-		addTaskButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
-				JComboBox selectTask = new JComboBox(tasksList);
-				JComboBox assignedTo = new JComboBox(usersList);
-				JTextField start = new JTextField(30);
-			    JTextField end = new JTextField(30);
-				JTextField taskName = new JTextField(25);
-			    JTextField taskDescription = new JTextField(30);
-			    JPanel taskPanel = new JPanel();
-			    taskPanel.add(new JLabel("Name of task:"));
-			    taskPanel.add(taskName);
-			    taskPanel.add(Box.createVerticalStrut(15)); // a spacer
-			    taskPanel.add(new JLabel("Description of task:"));
-			    taskPanel.add(taskDescription);
-			    taskPanel.add(new JLabel("Choose the user:"));
-			    taskPanel.add(assignedTo);
-			    taskPanel.add(new JLabel("Start time. Enter yyyy-MM-dd HH:mm:ss")); 
-			    taskPanel.add(start); // change to field where user can select the date and time
-			    taskPanel.add(new JLabel("End time. Enter yyyy-MM-dd HH:mm:ss"));
-			    taskPanel.add(end); // change to field where user can select the date and time
-			    taskPanel.setLayout(new BoxLayout(taskPanel, BoxLayout.Y_AXIS));
-
-			    int result = JOptionPane.showConfirmDialog(null, taskPanel, 
-			               "Create a new Task", JOptionPane.OK_CANCEL_OPTION);
-			    if (result == JOptionPane.OK_OPTION) {
-			         System.out.println("Name of task: " + taskName.getText());
-			         System.out.println("Description of task: " + taskDescription.getText());
-			         Task newTask = new Task(taskName.getText(), taskDescription.getText());
-			         newTask.setStartTime(start.getText());
-			         newTask.setEndTime(end.getText());
-			         newTask.setAssignedTo((User)assignedTo.getSelectedItem());
-			         Task taskCreated = TaskDAO.insertTask(newTask, users);
-			         System.out.println("Start: " + newTask.getStartTime());
-			         System.out.println("End: " + newTask.getEndTime());
-			         System.out.println("Assigned to: " + newTask.getAssignedTo());
-			         tasksList.addElement(taskCreated);
-			       
-			    }}});
+		// button for adding new task
+		AddNewTask newTask = new AddNewTask(usersList, tasks, users, tasksToday);
+		addTaskButton.addActionListener(newTask);
 		
-		// click on button
-		selectTaskButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
-				JComboBox selectTask = new JComboBox(tasksList);
-				JComboBox assignedTo = new JComboBox(usersList);
-				JTextField start = new JTextField(30);
-			    JTextField end = new JTextField(30);
-			    JPanel selectPanel = new JPanel();
-			    selectPanel.add(new JLabel("Choose the task:"));
-			    selectPanel.add(selectTask);
-			    selectPanel.add(Box.createVerticalStrut(15)); // a spacer
-			    selectPanel.add(new JLabel("Choose the user:"));
-			    selectPanel.add(assignedTo);
-			    selectPanel.add(new JLabel("Start time. Enter yyyy-MM-dd HH:mm:ss")); 
-			    selectPanel.add(start); // change to field where user can select the date and time
-			    selectPanel.add(new JLabel("End time. Enter yyyy-MM-dd HH:mm:ss"));
-			    selectPanel.add(end); // change to field where user can select the date and time
-			    selectPanel.setLayout(new BoxLayout(selectPanel, BoxLayout.Y_AXIS));
-			    
-			    int result = JOptionPane.showConfirmDialog(null, selectPanel, 
-			               "Choose the task and user", JOptionPane.OK_CANCEL_OPTION);
-			    if (result == JOptionPane.OK_OPTION) {
-			    
-			    }}});
-				
-		// add buttons to panelButtons
-		buttonPanel.add(addUserButton);
-	    buttonPanel.add(addTaskButton);
-	    buttonPanel.setSize(200, 200);
-	    buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+		// list with today's tasks
+		JList listWithTasksToday= new JList(tasksToday);
+		ArrayList<Task> tasksTod = new ArrayList<Task>();
+		for (Task t : tasks) {
+			Date firstDate = CellRenderer.getZeroTimeDate(t.getStartTime());
+			Date secondDate = CellRenderer.getZeroTimeDate(today);
+			if (firstDate.equals(secondDate)) {
+				tasksToday.addElement(t);
+			}
+		}	
+		System.out.println(tasksToday.toString());
 		
+		// list with tomorrow's tasks
+		Calendar calTomorrow = Calendar.getInstance();
+		calTomorrow.setTime(tomorrow);
+		calTomorrow.add(Calendar.DATE, 1);
+		tomorrow = calTomorrow.getTime();
+		JList listWithTasksTomorrow= new JList(tasksTomorrow);
+		ArrayList<Task> tasksTom = new ArrayList<Task>();
+		for (Task t : tasks) {
+			Date firstDate = CellRenderer.getZeroTimeDate(t.getStartTime());
+			Date secondDate = CellRenderer.getZeroTimeDate(tomorrow);
+			if (firstDate.equals(secondDate)) {
+				tasksTomorrow.addElement(t);
+			}
+		}	
+		
+		// show a dialog for edit user, when we click on the user
+		ListUserListener listListenerU = new ListUserListener(usersList, listWithUsers);
+		listWithUsers.addListSelectionListener(listListenerU);
+		
+		// show a dialog for edit task, when we click on the today's task
+		ListTaskListener listListenerT = new ListTaskListener(usersList, tasksToday, listWithTasksToday, users);
+		listWithTasksToday.addListSelectionListener(listListenerT);
+		
+		// show a dialog for edit task, when we click on the tomorrow's task
+		ListTaskListener listListenerTomorrow = new ListTaskListener(usersList, tasksTomorrow, listWithTasksTomorrow, users);
+		listWithTasksTomorrow.addListSelectionListener(listListenerTomorrow);
+		
+		// show a dialog for edit task, when we click on the task (list with all the tasks)
+		ListTaskListener listListenerTask = new ListTaskListener(usersList, tasksList, listWithTasks, users);
+		listWithTasks.addListSelectionListener(listListenerTask);
+	
 		/*User's list
 		User user1 = new User("Justyna", "Garyga");
 		User user2 = new User("Peter", "Garyga");
@@ -207,265 +174,49 @@ public class Planner extends JFrame {
 		tasksList.addElement(task7);
 		*/
 		// Tasks that want to use the application and don't have a database yet can use this code to have a working version
-		
+
 		Border border = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
 		userLabel.setBorder(border); 
 		taskLabel.setBorder(border);
+		taskTodayLabel.setBorder(border);
+		taskTomorrowLabel.setBorder(border);
+		
+		// the panel with buttons for adding users and tasks
+		buttonPanel.add(addUserButton);
+		buttonPanel.add(addTaskButton);
+		buttonPanel.setSize(200, 200);
+		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+		
+		JScrollPane scrollPaneListU = new JScrollPane();
+		scrollPaneListU.setViewportView(listWithUsers);
+		JScrollPane scrollPaneListT = new JScrollPane();
+		scrollPaneListT.setViewportView(listWithTasks);
+		JScrollPane scrollPaneListToday = new JScrollPane();
+		scrollPaneListToday.setViewportView(listWithTasksToday);
+		JScrollPane scrollPaneListTomorrow = new JScrollPane();
+		scrollPaneListTomorrow.setViewportView(listWithTasksTomorrow);
 		
 		// the panel with list on the left side
 		listPanel.add(userLabel); 
-		listPanel.add(listWithUsers);
+		listPanel.add(scrollPaneListU);
+		listPanel.add(Box.createRigidArea(new Dimension(0,20)));
+		listPanel.add(taskTodayLabel);
+		listPanel.add(scrollPaneListToday);
+		listPanel.add(Box.createRigidArea(new Dimension(0,20)));
+		listPanel.add(taskTomorrowLabel);
+		listPanel.add(scrollPaneListTomorrow);
 		listPanel.add(Box.createRigidArea(new Dimension(0,20)));
 		listPanel.add(taskLabel);
-		listPanel.add(listWithTasks);
-		listPanel.setBackground(Color.white);
+		listPanel.add(scrollPaneListT);
+		listPanel.setBackground(Color.LIGHT_GRAY);
 		listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
 		
 		// the panel with buttons on the top
 		topPanel.setLayout(new BorderLayout());
-		topPanel.setBackground(Color.white);
+		topPanel.setBackground(Color.MAGENTA);
 		topPanel.add(buttonPanel, BorderLayout.LINE_END);
-		topPanel.add(selectTaskButton, BorderLayout.LINE_START);
 		plannerFrame.add(topPanel, BorderLayout.PAGE_START);
 		plannerFrame.add(listPanel, BorderLayout.LINE_START); 
-		
-		// show a JFrame for edit user, when we click on the user in User's list
-		listWithUsers.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent evtU) {
-				//JFrame to edit User
-				JFrame editUserFrame = new JFrame("Edit the User");
-				editUserFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				editUserFrame.setSize(300, 200);
-				editUserFrame.setLocation(600, 200);
-				// the text field
-				JTextField userName = new JTextField(25);
-				JTextField userSurname = new JTextField(25);
-				JPanel userPanel = new JPanel();
-				JPanel okCancelPanel = new JPanel();
-			    JButton deleteUser = new JButton("Delete User");
-			    JButton okButton = new JButton("OK");
-			    JButton cancelButton = new JButton("Cancel");
-			    User editUser = (User)listWithUsers.getSelectedValue();
-			    
-			    if (listWithUsers.getSelectedValue() != null) {
-		    		userName.setText(((User)listWithUsers.getSelectedValue()).getName());
-		    		userSurname.setText(((User)listWithUsers.getSelectedValue()).getSurname());
-			    }
-
-			    userPanel.add(new JLabel("Edit name:"));
-			    userPanel.add(userName);
-			    userPanel.add(Box.createVerticalStrut(15)); // a spacer
-			    userPanel.add(new JLabel("Edit surname:"));
-			    userPanel.add(userSurname);
-			    userPanel.add(deleteUser);
-			    userPanel.setLayout(new BoxLayout(userPanel, BoxLayout.Y_AXIS));
-
-				okButton.setEnabled(false);
-				cancelButton.setEnabled(true);
-				okCancelPanel.add(okButton);
-				okCancelPanel.add(cancelButton);
-				okCancelPanel.setLayout(new FlowLayout());
-				userPanel.add(Box.createRigidArea(new Dimension(0,20)));
-				userPanel.setLayout(new BoxLayout(userPanel, BoxLayout.Y_AXIS));
-				
-				editUserFrame.add(userPanel, BorderLayout.CENTER);
-				editUserFrame.add(okCancelPanel, BorderLayout.PAGE_END);
-				
-				if (evtU.getValueIsAdjusting() == false && listWithUsers.getSelectedValue() != null) {
-					System.out.println("set it visible");
-					editUserFrame.setVisible(true);
-				}
-				
-				// button OK is clicable, when all of the JTextFields are filled
-				enableOKButtonUser(userName, userSurname, okButton);
-				
-				userName.addKeyListener(new KeyAdapter() {
-			        public void keyReleased(KeyEvent e) {
-			        	enableOKButtonUser(userName, userSurname, okButton);
-			        }
-				});
-				userSurname.addKeyListener(new KeyAdapter() {
-			        public void keyReleased(KeyEvent e) {
-			        	enableOKButtonUser(userName, userSurname, okButton);
-			        }
-				});
-				
-				// button Cancel close the frame to edit user
-				cancelButton.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent arg0) {
-						// TODO Auto-generated method stub
-						editUserFrame.dispose();
-					    }
-				});
-				
-				// button OK to save the changed user's name and/or surname
-				okButton.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent arg0) {
-						// TODO Auto-generated method stub
-						System.out.println("Name: " + userName.getText());
-					    System.out.println("Surname: " + userSurname.getText());
-					    editUser.setName(userName.getText());
-					    editUser.setSurname(userSurname.getText());
-					    User u = UserDAO.updateUser(editUser);
-					    if (u != null) {
-					    	editUser.setName(u.getName());
-						    editUser.setSurname(u.getSurname());
-					    }
-					    editUserFrame.dispose();
-					    }
-				});
-				
-				// button to delete the user from the list of users
-			    deleteUser.addActionListener(new ActionListener() {
-			    	@Override
-					public void actionPerformed(ActionEvent arg0) {
-			    		int i = usersList.getIndexOf(editUser);
-			    		boolean result = UserDAO.deleteUser(editUser); 
-			    		if (result == true) {
-			    			usersList.removeElementAt(i);
-			    		}
-			    		editUserFrame.dispose();
-			    	}
-				});
-			}
-		});
-		
-		// show a dialog for edit task, when we click on the task- to change it to JFrame!
-		listWithTasks.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent evtT) {
-				//JFrame to edit User
-				JFrame editTaskFrame = new JFrame("Edit the task");
-				editTaskFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); //clicking on X - do nothing
-				editTaskFrame.setSize(300, 300);
-				editTaskFrame.setLocation(600, 200);
-				JComboBox selectTask = new JComboBox(tasksList);
-				JComboBox assignedTo = new JComboBox(usersList);
-				JTextField taskName = new JTextField(25);
-			    JTextField taskDescription = new JTextField(30);
-			    JTextField start = new JTextField(30);
-			    JTextField end = new JTextField(30);
-			    JPanel okCancelPanel = new JPanel();
-			    JButton deleteTask = new JButton("Delete task");
-			    JButton okButton = new JButton("OK");
-			    JButton cancelButton = new JButton("Cancel");
-			    Task editTask = (Task)listWithTasks.getSelectedValue();
-				JPanel taskPanel = new JPanel();
-				
-				if (listWithTasks.getSelectedValue() != null) {
-		    		taskName.setText(((Task)listWithTasks.getSelectedValue()).getNameTask());
-		    		taskDescription.setText(((Task)listWithTasks.getSelectedValue()).getDescriptionTask());
-		    		Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
-					String startFormatted = formatter.format(((Task)listWithTasks.getSelectedValue()).getStartTime());
-					String endFormatted = formatter.format(((Task)listWithTasks.getSelectedValue()).getEndTime());
-		    		start.setText(startFormatted);
-		    		end.setText(endFormatted);
-				}
-
-			    taskPanel.add(new JLabel("Edit name of task:"));
-			    taskPanel.add(taskName);
-			    taskPanel.add(Box.createVerticalStrut(15)); // a spacer
-			    taskPanel.add(new JLabel("Edit description of task:"));
-			    taskPanel.add(taskDescription);
-			    taskPanel.add(new JLabel("Choose the user:"));
-			    taskPanel.add(assignedTo);
-			    taskPanel.add(new JLabel("Edit start time. Enter yyyy-MM-dd HH:mm:ss")); 
-			    taskPanel.add(start); // change to field where user can select the date and time
-			    taskPanel.add(new JLabel("Edit end time. Enter yyyy-MM-dd HH:mm:ss"));
-			    taskPanel.add(end); // change to field where user can select the date and time
-			    taskPanel.add(deleteTask);
-
-			    okButton.setEnabled(false);
-				cancelButton.setEnabled(true);
-				okCancelPanel.add(okButton);
-				okCancelPanel.add(cancelButton);
-				okCancelPanel.setLayout(new FlowLayout());
-				taskPanel.add(Box.createRigidArea(new Dimension(0,20)));
-				taskPanel.setLayout(new BoxLayout(taskPanel, BoxLayout.Y_AXIS));
-				
-				editTaskFrame.add(taskPanel, BorderLayout.CENTER);
-				editTaskFrame.add(okCancelPanel, BorderLayout.PAGE_END);
-				
-				if (evtT.getValueIsAdjusting() == false && listWithTasks.getSelectedValue() != null) {
-					System.out.println("set it visible");
-					editTaskFrame.setVisible(true);
-				}
-				
-				//button OK become clickable when all the text fields have been completed
-				enableOKButtonTask(taskName, taskDescription, start, end, okButton);
-				taskName.addKeyListener(new KeyAdapter() {
-			        public void keyReleased(KeyEvent e) {
-			        	enableOKButtonTask(taskName, taskDescription, start, end, okButton);
-			        }
-				});
-				taskDescription.addKeyListener(new KeyAdapter() {
-			        public void keyReleased(KeyEvent e) {
-			        	enableOKButtonTask(taskName, taskDescription, start, end, okButton);
-			        }
-				});
-				start.addKeyListener(new KeyAdapter() {
-			        public void keyReleased(KeyEvent e) {
-			        	enableOKButtonTask(taskName, taskDescription, start, end, okButton);
-			        }
-				});
-				end.addKeyListener(new KeyAdapter() {
-			        public void keyReleased(KeyEvent e) {
-			        	enableOKButtonTask(taskName, taskDescription, start, end, okButton);
-			        }
-				});
-				
-				// button Cancel close the frame to edit user
-				cancelButton.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent arg0) {
-						// TODO Auto-generated method stub
-						editTaskFrame.dispose();
-					}
-				});
-				
-				// button OK to save the changed user's name and/or surname
-				okButton.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent arg0) {
-						// TODO Auto-generated method stub
-
-						editTask.setNameTask(taskName.getText());
-						editTask.setDescriptionTask(taskDescription.getText());
-						editTask.setStartTime(start.getText());
-						editTask.setEndTime(end.getText());
-						System.out.println("Name of task: " + taskName.getText());
-						System.out.println("Description of task: " + taskDescription.getText());
-						System.out.println("Start: " + editTask.getStartTime());
-						System.out.println("End: " + editTask.getEndTime());
-						System.out.println("Assigned to: " + editTask.getAssignedTo());
-						Task t = TaskDAO.updateTask(editTask, users);
-						    if (t != null) {
-						    	editTask.setNameTask(t.getNameTask());
-							    editTask.setDescriptionTask(t.getDescriptionTask());
-							    editTask.setStartTime(t.getStartTime());
-							    editTask.setEndTime(t.getEndTime());
-							    editTask.setAssignedTo(t.getAssignedTo());
-						    }
-					    editTaskFrame.dispose();
-					    }
-				});
-				
-				// button to delete the user from the list of users
-			    deleteTask.addActionListener(new ActionListener() {
-			    	@Override
-					public void actionPerformed(ActionEvent arg0) {
-			    		int i = tasksList.getIndexOf(editTask);
-			    		boolean result = TaskDAO.deleteTask(editTask); 
-			    		if (result == true) {
-			    			tasksList.removeElementAt(i);
-			    		}
-			    		editTaskFrame.dispose();
-			    	}
-				});
-			    System.out.println("Selected from " + evtT.getFirstIndex() + " to " + evtT.getLastIndex());	 
-			}
-		});	
 		
 		// JTable for calendar
 		String[] columnNames = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
@@ -474,14 +225,25 @@ public class Planner extends JFrame {
 		JTable calendar = new JTable(model);
 	    monthLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-		calendar.setRowHeight(70);
+		calendar.setRowHeight(80);
 		calendar.setCellSelectionEnabled(true); // cells are clicable
+		calendar.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		calendar.setShowGrid(true); 
 		calendar.setGridColor(Color.LIGHT_GRAY);
 		JScrollPane sp=new JScrollPane(calendar);
 		int rowCount = 5;
 		model.setRowCount(rowCount);
 		
+		// cells renderer 
+		calendar.setDefaultRenderer(Object.class, new CellRenderer(tasks, cal));
+		
+		// cells listeners
+		CellListener cellListen = new CellListener(usersList, tasks, users, tasksList, calendar, cal);
+		ListSelectionModel cellSelectionModel = calendar.getSelectionModel();
+	    cellSelectionModel.addListSelectionListener(cellListen);
+	    calendar.getColumnModel().getSelectionModel().addListSelectionListener(cellListen);
+
+		// last month
 		JButton buttonLow = new JButton("<-");
 			buttonLow.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent ae) {
@@ -489,7 +251,8 @@ public class Planner extends JFrame {
 					updateMonth();
 				}
 		    });
-			
+		
+		// next month
 		JButton buttonHight = new JButton("->");
 			buttonHight.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent ae) {
@@ -502,21 +265,27 @@ public class Planner extends JFrame {
 		changeMonthPanel.add(buttonLow, BorderLayout.WEST);
 		changeMonthPanel.add(monthLabel, BorderLayout.NORTH);
 		changeMonthPanel.add(buttonHight, BorderLayout.EAST);
-		changeMonthPanel.setBackground(Color.GREEN);
+		changeMonthPanel.setBackground(Color.LIGHT_GRAY);
 		calPanel.add(changeMonthPanel);
 		calPanel.add(sp);
+		calPanel.setBackground(Color.LIGHT_GRAY);
 		calPanel.setLayout(new BoxLayout(calPanel, BoxLayout.Y_AXIS));
 		plannerFrame.add(calPanel);
 		
 		this.updateMonth();
+		
+		// display today's date
+		System.out.println("Today is: " + today);
+		JTextField todayField = new JTextField(today.toString());
+		plannerFrame.add(todayField, BorderLayout.PAGE_END);
 	}
-	
+
 	//method to update month 
 	void updateMonth() {
 		cal.set(Calendar.DAY_OF_MONTH, 1);
 		     
-		String month = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.US);
-		int year = cal.get(Calendar.YEAR);
+		month = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.US);
+		year = cal.get(Calendar.YEAR);
 		monthLabel.setText(month + " " + year);
 		     
 		int startDay = cal.get(Calendar.DAY_OF_WEEK);
@@ -532,23 +301,4 @@ public class Planner extends JFrame {
 			i = i + 1;
 		}
 	}     
-	
-	// method to set the OK button enabled- JFrame to edit users
-	void enableOKButtonUser (JTextField userName, JTextField userSurname, JButton okButton) {
-		if (userName.getText().length() == 0 || userSurname.getText().length() == 0) {
-			okButton.setEnabled(false);
-		} else {
-			okButton.setEnabled(true);
-		}
-	}
-	
-	// method to set the OK button enabled- JFrame to edit tasks
-	void enableOKButtonTask (JTextField taskName, JTextField taskDescription, JTextField start, JTextField end, JButton okButton) {
-		if (taskName.getText().length() == 0 || taskDescription.getText().length() == 0
-    			|| start.getText().length() == 0 || end.getText().length() == 0) {
-    		okButton.setEnabled(false);
-    	} else {
-    		okButton.setEnabled(true);
-    	}
-	}
 }
