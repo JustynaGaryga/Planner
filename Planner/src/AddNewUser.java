@@ -33,8 +33,6 @@ public class AddNewUser implements ActionListener {
 		int result = JOptionPane.showConfirmDialog(null, userPanel, 
 				"Create a new User", JOptionPane.OK_CANCEL_OPTION);
 		if (result == JOptionPane.OK_OPTION) {
-			System.out.println("Name: " + userName.getText());
-			System.out.println("Surname: " + userSurname.getText());
 			User newUser = new User(userName.getText(), userSurname.getText());
 			User userCreated = UserDAO.insertUser(newUser);
 			usersList.addElement(userCreated);

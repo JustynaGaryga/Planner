@@ -23,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 
 class ListTaskListener implements ListSelectionListener  {
 
@@ -30,12 +31,19 @@ class ListTaskListener implements ListSelectionListener  {
 	DefaultComboBoxModel<Task> tasksList;
 	JList listWithTasks;
 	ArrayList<User> users;
+	ArrayList<Task> tasks;
+	DefaultComboBoxModel<Task> listAllTasks;
+	DefaultTableModel modelCalendar;
 	
-	public ListTaskListener(DefaultComboBoxModel<User> usersList, DefaultComboBoxModel<Task> tasksList, JList listWithTasks, ArrayList<User> users) {
+	public ListTaskListener(DefaultComboBoxModel<User> usersList, DefaultComboBoxModel<Task> tasksList, JList listWithTasks, ArrayList<User> users, ArrayList<Task> tasks, 
+			DefaultComboBoxModel<Task> listAllTasks, DefaultTableModel modelCalendar) {
 		this.usersList= usersList;
 		this.tasksList= tasksList;
 		this.listWithTasks= listWithTasks;
 		this.users= users;
+		this.tasks= tasks;
+		this.listAllTasks = listAllTasks;
+		this.modelCalendar = modelCalendar;
 	}
 	
 	@Override		
@@ -138,7 +146,6 @@ class ListTaskListener implements ListSelectionListener  {
 			taskName.setText(((Task)listWithTasks.getSelectedValue()).getNameTask());
 			taskDescription.setText(((Task)listWithTasks.getSelectedValue()).getDescriptionTask());
 			Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
-			System.out.println(((Task)listWithTasks.getSelectedValue()).getStartTime().toString());
 			String startFormatted = formatter.format(((Task)listWithTasks.getSelectedValue()).getStartTime());
 			String endFormatted = formatter.format(((Task)listWithTasks.getSelectedValue()).getEndTime());
 			start.setText(startFormatted);
@@ -247,7 +254,6 @@ class ListTaskListener implements ListSelectionListener  {
 		editTaskFrame.add(okCancelPanel, BorderLayout.PAGE_END);
 		
 		if (evtT.getValueIsAdjusting() == false && listWithTasks.getSelectedValue() != null) {
-			System.out.println("set it visible");
 			editTaskFrame.setVisible(true);
 		}
 						
@@ -293,11 +299,6 @@ class ListTaskListener implements ListSelectionListener  {
 				editTask.setStartTime(start.getText());
 				editTask.setEndTime(end.getText());
 				editTask.setAssignedTo((User)assignedTo.getSelectedItem());
-				System.out.println("Name of task: " + taskName.getText());
-				System.out.println("Description of task: " + taskDescription.getText());
-				System.out.println("Start: " + editTask.getStartTime());
-				System.out.println("End: " + editTask.getEndTime());
-				System.out.println("Assigned to: " + editTask.getAssignedTo());
 				Task t = TaskDAO.updateTask(editTask, users);
 				if (t != null) {
 					editTask.setNameTask(t.getNameTask());
@@ -315,14 +316,18 @@ class ListTaskListener implements ListSelectionListener  {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				int i = tasksList.getIndexOf(editTask);
+				int j = tasks.indexOf(editTask);
+				int k = listAllTasks.getIndexOf(editTask);
 				boolean result = TaskDAO.deleteTask(editTask); 
 				if (result == true) {
 					tasksList.removeElementAt(i);
+					tasks.remove(j);
+					listAllTasks.removeElementAt(k);
+					modelCalendar.fireTableDataChanged();
 				}
 				editTaskFrame.dispose();
 			}
-		});
-		System.out.println("Selected from " + evtT.getFirstIndex() + " to " + evtT.getLastIndex());	 
+		}); 
 	}
 	
 	// method to set the OK button enabled- JFrame to edit tasks

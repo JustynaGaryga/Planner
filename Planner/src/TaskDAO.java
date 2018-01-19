@@ -28,14 +28,11 @@ public class TaskDAO {
 			// Step 3: Execute a SQL SELECT query, the query result
 			//  is returned in a 'ResultSet' object.
 			String strSelect = "select taskID, nameTask, descriptionTask, assignedTo, startTime, endTime from tasks";
-			System.out.println("The SQL query is: " + strSelect); // Echo For debugging
-	        System.out.println();
 	 
 	        ResultSet rset = stmt.executeQuery(strSelect);
 	 
 	        // Step 4: Process the ResultSet by scrolling the cursor forward via next().
 	        //  For each row, retrieve the contents of the cells with getXxx(columnName).
-	        System.out.println("The records selected are:");
 	        int rowCount = 0;
 	        while(rset.next()) {   // Move the cursor to the next row, return false if no more row
 	        	String nameTask = rset.getString("nameTask");
@@ -46,7 +43,6 @@ public class TaskDAO {
 	            	startTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(rset.getString("startTime"));
 	            	endTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(rset.getString("endTime"));
 	            } catch (ParseException e) {
-	            	System.out.println("ParseException date");
 	            }
 	            int assignedTo = rset.getInt("assignedTo");
 	            int taskID = rset.getInt("taskID");
@@ -61,10 +57,8 @@ public class TaskDAO {
 	    		}
 	            Task task = new Task(nameTask, descriptionTask, startTime, endTime, assignedUser, taskID);
 	            tasks.add(task);
-	            System.out.println(nameTask + ", " + descriptionTask + ", " + startTime + ", " + endTime + ", " + assignedTo + ", " + taskID);
 	            ++rowCount;
 	        }
-	        System.out.println("Total number of records = " + rowCount);
 	} catch (SQLException ex) {
 		ex.printStackTrace();
 	}
@@ -87,14 +81,13 @@ public class TaskDAO {
 			
 			// Step 3 & 4: Execute a SQL UPDATE via executeUpdate()
 			//   which returns an int indicating the number of rows affected.
-			String strUpdate = "update tasks set nameTask =' " + t.getNameTask() + "', descriptionTask= '" + t.getDescriptionTask() + "', assignedTo= " + t.getAssignedTo().getId() + ", startTime= '" + startFormatted + "', endTime= '" + endFormatted + "' where taskID=" + String.valueOf(t.getTaskID());
-			System.out.println("The SQL query is: " + strUpdate);  // Echo for debugging
+			String strUpdate = "update tasks set nameTask =' " + t.getNameTask() + "', descriptionTask= '" + t.getDescriptionTask() 
+			+ "', assignedTo= " + t.getAssignedTo().getId() + ", startTime= '" + startFormatted + "', endTime= '" + endFormatted + 
+			"' where taskID=" + String.valueOf(t.getTaskID());
 			int countUpdated = stmt.executeUpdate(strUpdate);
-			System.out.println(countUpdated + " records affected.");
-			
+	
 			// Step 3 & 4: Issue a SELECT to check the UPDATE.
 			String strSelect = "select * from tasks" + " where taskID=" + String.valueOf(t.getTaskID());
-			System.out.println("The SQL query is: " + strSelect);  // Echo for debugging
 			ResultSet rset = stmt.executeQuery(strSelect);
 			
 			while(rset.next()) {   // Move the cursor to the next row
@@ -144,14 +137,12 @@ public class TaskDAO {
 			String endFormatted = formatter.format(t.getEndTime());
 			
 			String sqlInsert = "insert into tasks  (nameTask, descriptionTask, startTime, endTime, assignedTo) " // need a space
-					+ "values ('" + t.getNameTask() + "', '" + t.getDescriptionTask() + "', '" + startFormatted + "', '" + endFormatted +  "', " + t.getAssignedTo().getId() + ")";
-			System.out.println("The SQL query is: " + sqlInsert);  // Echo for debugging
+					+ "values ('" + t.getNameTask() + "', '" + t.getDescriptionTask() + "', '" + startFormatted +
+					"', '" + endFormatted +  "', " + t.getAssignedTo().getId() + ")";
 			int countInserted = stmt.executeUpdate(sqlInsert);
-			System.out.println(countInserted + " records inserted.\n");
 		
 			// Issue a SELECT to check the changes
 			String strSelect = "select * from tasks order by taskID desc limit 1";
-			System.out.println("The SQL query is: " + strSelect);  // Echo For debugging
 			ResultSet rset = stmt.executeQuery(strSelect);
 			while(rset.next()) {   // Move the cursor to the next row
 				String nameTask = rset.getString("nameTask");
@@ -197,9 +188,7 @@ public class TaskDAO {
 			//   which returns an int indicating the number of rows affected.
 			// DELETE selected record
 			String sqlDelete = "delete from tasks" + " where taskID=" + String.valueOf(t.getTaskID());
-			System.out.println("The SQL query is: " + sqlDelete);  // Echo for debugging
 			int countDeleted = stmt.executeUpdate(sqlDelete);
-			System.out.println(countDeleted + " records deleted.\n");
 			if (countDeleted > 0) {
 				return true;
 			} else {
