@@ -58,7 +58,6 @@ class ListListener implements ListSelectionListener {
 			taskName.setText(((Task)listWithTasks.getSelectedValue()).getNameTask());
 			taskDescription.setText(((Task)listWithTasks.getSelectedValue()).getDescriptionTask());
 			Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
-			System.out.println(((Task)listWithTasks.getSelectedValue()).getStartTime().toString());
 			String startFormatted = formatter.format(((Task)listWithTasks.getSelectedValue()).getStartTime());
 			String endFormatted = formatter.format(((Task)listWithTasks.getSelectedValue()).getEndTime());
 			start.setText(startFormatted);
@@ -92,7 +91,6 @@ class ListListener implements ListSelectionListener {
 		editTaskFrame.add(okCancelPanel, BorderLayout.PAGE_END);
 		
 		if (evtT.getValueIsAdjusting() == false && listWithTasks.getSelectedValue() != null) {
-			System.out.println("set it visible");
 			editTaskFrame.setVisible(true);
 		}
 						
@@ -138,11 +136,6 @@ class ListListener implements ListSelectionListener {
 				editTask.setStartTime(start.getText());
 				editTask.setEndTime(end.getText());
 				editTask.setAssignedTo((User)assignedTo.getSelectedItem());
-				System.out.println("Name of task: " + taskName.getText());
-				System.out.println("Description of task: " + taskDescription.getText());
-				System.out.println("Start: " + editTask.getStartTime());
-				System.out.println("End: " + editTask.getEndTime());
-				System.out.println("Assigned to: " + editTask.getAssignedTo());
 				Task t = TaskDAO.updateTask(editTask, users);
 				if (t != null) {
 					editTask.setNameTask(t.getNameTask());
@@ -167,7 +160,6 @@ class ListListener implements ListSelectionListener {
 				editTaskFrame.dispose();
 			}
 		});
-		System.out.println("Selected from " + evtT.getFirstIndex() + " to " + evtT.getLastIndex());	 
 	}
 	
 	// method to set the OK button enabled- JFrame to edit tasks

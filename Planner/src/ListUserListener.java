@@ -40,7 +40,6 @@ public class ListUserListener implements ListSelectionListener {
 		editUserFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		editUserFrame.setSize(300, 200);
 		editUserFrame.setLocation(600, 200);
-		// the text field
 		JTextField userName = new JTextField(25);
 		JTextField userSurname = new JTextField(25);
 		JPanel userPanel = new JPanel();
@@ -75,7 +74,6 @@ public class ListUserListener implements ListSelectionListener {
 		editUserFrame.add(okCancelPanel, BorderLayout.PAGE_END);
 		
 		if (evtU.getValueIsAdjusting() == false && listWithUsers.getSelectedValue() != null) {
-			System.out.println("set it visible");
 			editUserFrame.setVisible(true);
 		}
 					
@@ -107,8 +105,6 @@ public class ListUserListener implements ListSelectionListener {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				System.out.println("Name: " + userName.getText());
-				System.out.println("Surname: " + userSurname.getText());
 				editUser.setName(userName.getText());
 				editUser.setSurname(userSurname.getText());
 				User u = UserDAO.updateUser(editUser);

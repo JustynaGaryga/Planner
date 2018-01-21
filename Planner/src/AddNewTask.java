@@ -114,10 +114,7 @@ public class AddNewTask implements ActionListener {
 		dayEnd.setSelectedIndex(Calendar.getInstance().get(Calendar.DAY_OF_MONTH) - 1);
 		hourEnd.setSelectedIndex(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
 		minuteEnd.setSelectedIndex(Calendar.getInstance().get(Calendar.MINUTE));
-		System.out.println(Calendar.getInstance().get(Calendar.YEAR));
-		System.out.println(Calendar.getInstance().get(Calendar.MONTH));
-		System.out.println(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
-		System.out.println("Hour " + Calendar.getInstance().get(Calendar.HOUR_OF_DAY));   
+ 
 		// display the date from JComboBoxes in the JTextFields
 		start.setText(yearStart.getSelectedItem().toString() + "-" + monthStart.getSelectedItem().toString() + "-" + 
 			dayStart.getSelectedItem().toString() + " " + hourStart.getSelectedItem().toString() + ":" + minuteStart.getSelectedItem().toString() + ":00");		    
@@ -232,20 +229,12 @@ public class AddNewTask implements ActionListener {
 		int result = JOptionPane.showConfirmDialog(null, taskPanel, 
 				"Create a new Task", JOptionPane.OK_CANCEL_OPTION);
 		if (result == JOptionPane.OK_OPTION) {
-			System.out.println("Name of task: " + taskName.getText());
-			System.out.println("Description of task: " + taskDescription.getText());
 			Task newTask = new Task(taskName.getText(), taskDescription.getText());
 			newTask.setStartTime(start.getText());
 			newTask.setEndTime(end.getText());
 			newTask.setAssignedTo((User)assignedTo.getSelectedItem());
 		   
 			Task taskCreated = TaskDAO.insertTask(newTask, users);
-			System.out.println("Start: " + newTask.getStartTime());
-			System.out.println("End: " + newTask.getEndTime());
-			System.out.println("Assigned to: " + newTask.getAssignedTo());
-			System.out.println("Start: " + taskCreated.getStartTime());
-			System.out.println("End: " + taskCreated.getEndTime());
-			System.out.println("Assigned to: " + taskCreated.getAssignedTo());
 			tasks.add(taskCreated);
 			Date today = Calendar.getInstance().getTime();
 			Date firstDate = CellRenderer.getZeroTimeDate(taskCreated.getStartTime());

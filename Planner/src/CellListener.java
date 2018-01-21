@@ -27,15 +27,20 @@ public class CellListener implements ListSelectionListener {
 	ArrayList<User> users;
 	DefaultComboBoxModel<Task> tasksList;
 	DefaultComboBoxModel<Task> cellTasks;
+	DefaultComboBoxModel<Task> tasksToday;
+	DefaultComboBoxModel<Task> tasksTomorrow;
 	JTable calendar;
 	Calendar cal;
 	
-	public CellListener(DefaultComboBoxModel<User> usersList, ArrayList<Task> tasks, ArrayList<User> users, DefaultComboBoxModel<Task> tasksList, JTable calendar, Calendar cal) {
+	public CellListener(DefaultComboBoxModel<User> usersList, ArrayList<Task> tasks, ArrayList<User> users, DefaultComboBoxModel<Task> tasksList,
+			DefaultComboBoxModel<Task> tasksToday, DefaultComboBoxModel<Task> tasksTomorrow, JTable calendar, Calendar cal) {
 		this.usersList= usersList;
 		this.tasks= tasks;
 		this.users= users;
 		this.tasksList= tasksList;
 		this.cellTasks = new DefaultComboBoxModel<Task>();
+		this.tasksToday = tasksToday;
+		this.tasksTomorrow = tasksTomorrow;
 		this.calendar= calendar;
 		this.cal= cal;
 	}
@@ -227,107 +232,108 @@ public class CellListener implements ListSelectionListener {
 			Integer selectedData = null;
 			int selectedRow = calendar.getSelectedRow();
 			int selectedColumn = calendar.getSelectedColumn();
-			System.out.println("Second listener");
-			System.out.println("second listener row " + selectedRow);
-			System.out.println("second listner column " + selectedColumn);
 			if (selectedRow != -1 && selectedColumn != -1) {
         		selectedData = (Integer) calendar.getValueAt(selectedRow, selectedColumn);
         	    int month = cal.get(Calendar.MONTH);
         		int year = cal.get(Calendar.YEAR);
-        		Date cellDate = new GregorianCalendar(year, month, selectedData).getTime();
-        		Calendar cellCalendar = Calendar.getInstance(); 
-        		cellCalendar.setTime(cellDate); 
-        		for (Task t : tasks) {
-        			Date firstDate = CellRenderer.getZeroTimeDate(t.getStartTime());
-        		    Date secondDate = CellRenderer.getZeroTimeDate(cellDate);
-        		    if (firstDate.equals(secondDate)) {
-        		    	System.out.println("Today's task");
-        	    		cellTasks.addElement(t);
-        		    }
-        		}
+        		System.out.println(selectedData);
+        			if (selectedData != null) {
+        				Date cellDate = new GregorianCalendar(year, month, selectedData).getTime();
+        				Calendar cellCalendar = Calendar.getInstance(); 
+        				cellCalendar.setTime(cellDate); 
+        				for (Task t : tasks) {
+        					Date firstDate = CellRenderer.getZeroTimeDate(t.getStartTime());
+        					Date secondDate = CellRenderer.getZeroTimeDate(cellDate);
+        					if (firstDate.equals(secondDate)) {
+        						System.out.println("Today's task");
+        						cellTasks.addElement(t);
+        					}
+        				}
+        				
+        				// JComboBoxes for choose the date- start with choosing date
+        				yearStart.setSelectedItem(cellCalendar.get(Calendar.YEAR));
+        				monthStart.setSelectedIndex(cellCalendar.get(Calendar.MONTH));
+        				dayStart.setSelectedIndex(cellCalendar.get(Calendar.DAY_OF_MONTH) - 1);
+        				hourStart.setSelectedIndex(cellCalendar.get(Calendar.HOUR_OF_DAY));
+        				minuteStart.setSelectedIndex(cellCalendar.get(Calendar.MINUTE));
+        				yearEnd.setSelectedItem(cellCalendar.get(Calendar.YEAR));
+        				monthEnd.setSelectedIndex(cellCalendar.get(Calendar.MONTH));
+        				dayEnd.setSelectedIndex(cellCalendar.get(Calendar.DAY_OF_MONTH) - 1);
+        				hourEnd.setSelectedIndex(cellCalendar.get(Calendar.HOUR_OF_DAY));
+        				minuteEnd.setSelectedIndex(cellCalendar.get(Calendar.MINUTE));
         		
-        		// JComboBoxes for choose the date- start with choosing date
-        		yearStart.setSelectedItem(cellCalendar.get(Calendar.YEAR));
-        		monthStart.setSelectedIndex(cellCalendar.get(Calendar.MONTH));
-        		dayStart.setSelectedIndex(cellCalendar.get(Calendar.DAY_OF_MONTH) - 1);
-        		hourStart.setSelectedIndex(cellCalendar.get(Calendar.HOUR_OF_DAY));
-        		minuteStart.setSelectedIndex(cellCalendar.get(Calendar.MINUTE));
-        		yearEnd.setSelectedItem(cellCalendar.get(Calendar.YEAR));
-        		monthEnd.setSelectedIndex(cellCalendar.get(Calendar.MONTH));
-        		dayEnd.setSelectedIndex(cellCalendar.get(Calendar.DAY_OF_MONTH) - 1);
-        		hourEnd.setSelectedIndex(cellCalendar.get(Calendar.HOUR_OF_DAY));
-        		minuteEnd.setSelectedIndex(cellCalendar.get(Calendar.MINUTE));
+        				// display the date from JComboBoxes in the JTextFields
+        				start.setText(yearStart.getSelectedItem().toString() + "-" + monthStart.getSelectedItem().toString() + "-" + 
+        						dayStart.getSelectedItem().toString() + " " + hourStart.getSelectedItem().toString() + ":" + minuteStart.getSelectedItem().toString() + ":00");		    
+        				end.setText(yearEnd.getSelectedItem().toString() + "-" + monthEnd.getSelectedItem().toString() + "-" + 
+        						dayEnd.getSelectedItem().toString() + " " + hourEnd.getSelectedItem().toString() + ":" + minuteEnd.getSelectedItem().toString() + ":00");
         		
-        		// display the date from JComboBoxes in the JTextFields
-        		start.setText(yearStart.getSelectedItem().toString() + "-" + monthStart.getSelectedItem().toString() + "-" + 
-        			dayStart.getSelectedItem().toString() + " " + hourStart.getSelectedItem().toString() + ":" + minuteStart.getSelectedItem().toString() + ":00");		    
-        		end.setText(yearEnd.getSelectedItem().toString() + "-" + monthEnd.getSelectedItem().toString() + "-" + 
-        		 	dayEnd.getSelectedItem().toString() + " " + hourEnd.getSelectedItem().toString() + ":" + minuteEnd.getSelectedItem().toString() + ":00");
+        				result = JOptionPane.showConfirmDialog(null, taskPanel, 
+        						"Create a new Task", JOptionPane.OK_CANCEL_OPTION);
+        				if (result == JOptionPane.OK_OPTION) {
+        					Task newTask = new Task(taskName.getText(), taskDescription.getText());
+        					newTask.setStartTime(start.getText());
+        					newTask.setEndTime(end.getText());
+        					newTask.setAssignedTo((User)assignedTo.getSelectedItem());
         		
-        		result = JOptionPane.showConfirmDialog(null, taskPanel, 
-        				"Create a new Task", JOptionPane.OK_CANCEL_OPTION);
-        		if (result == JOptionPane.OK_OPTION) {
-        			System.out.println("Name of task: " + taskName.getText());
-        			System.out.println("Description of task: " + taskDescription.getText());
-        			Task newTask = new Task(taskName.getText(), taskDescription.getText());
-        			newTask.setStartTime(start.getText());
-        			newTask.setEndTime(end.getText());
-        			newTask.setAssignedTo((User)assignedTo.getSelectedItem());
-        		
-        			Task taskCreated = TaskDAO.insertTask(newTask, users);
-        			System.out.println("Start: " + newTask.getStartTime());
-        			System.out.println("End: " + newTask.getEndTime());
-        			System.out.println("Assigned to: " + newTask.getAssignedTo());
-        			System.out.println("Start: " + taskCreated.getStartTime());
-        			System.out.println("End: " + taskCreated.getEndTime());
-        			System.out.println("Assigned to: " + taskCreated.getAssignedTo());
-        			tasks.add(taskCreated);
+        					Task taskCreated = TaskDAO.insertTask(newTask, users);
+        					tasks.add(taskCreated);
         			
-        			Date today = Calendar.getInstance().getTime();
-        			Date firstDate = CellRenderer.getZeroTimeDate(taskCreated.getStartTime());
-        		    Date secondDate = CellRenderer.getZeroTimeDate(today);
-        		    if (firstDate.equals(secondDate)) {
-        		    	System.out.println("Today's task");
-        	    		cellTasks.addElement(taskCreated);
-        		    }
-        		      
-        			// save tasks repeatable yearly
-        			if (repeatableEachYear.isSelected()) {
-        				int yearRepeatable = taskCreated.getStartTime().getYear();
-        				for (int i = 1; i <= 10; i++) {
-        					Task t = new Task(taskName.getText(), taskDescription.getText()); 
-        					Date startDate = taskCreated.getStartTime();
-        					startDate.setYear(yearRepeatable + i);
-        					t.setStartTime(startDate); 
-        					Date endDate = taskCreated.getEndTime();
-        					endDate.setYear(yearRepeatable + i);
-        					t.setEndTime(endDate); 	
-        					t.setAssignedTo(taskCreated.getAssignedTo());
-        					TaskDAO.insertTask(t, users); 
-        		        }
-        		     }
+        					Date today = Calendar.getInstance().getTime();
+        					Date firstDate = CellRenderer.getZeroTimeDate(taskCreated.getStartTime());
+        					Date secondDate = CellRenderer.getZeroTimeDate(today);
+        					if (firstDate.equals(secondDate)) {
+        						cellTasks.addElement(taskCreated);
+        						tasksToday.addElement(taskCreated);
+        					}
+        					Date tomorrow = new Date();
+        					Calendar calTomorrow = Calendar.getInstance();
+        					calTomorrow.setTime(tomorrow);
+        					calTomorrow.add(Calendar.DATE, 1);
+        					tomorrow = calTomorrow.getTime();
+        					Date tomorrowDate = CellRenderer.getZeroTimeDate(tomorrow);
+        					if (firstDate.equals(tomorrowDate)) {
+        						tasksTomorrow.addElement(taskCreated);
+        					}
+        					
+        					// save tasks repeatable yearly
+        					if (repeatableEachYear.isSelected()) {
+        						int yearRepeatable = taskCreated.getStartTime().getYear();
+        						for (int i = 1; i <= 10; i++) {
+        							Task t = new Task(taskName.getText(), taskDescription.getText()); 
+        							Date startDate = taskCreated.getStartTime();
+        							startDate.setYear(yearRepeatable + i);
+        							t.setStartTime(startDate); 
+        							Date endDate = taskCreated.getEndTime();
+        							endDate.setYear(yearRepeatable + i);
+        							t.setEndTime(endDate); 	
+        							t.setAssignedTo(taskCreated.getAssignedTo());
+        							TaskDAO.insertTask(t, users); 
+        						}
+        					}
         		         
-        			// save tasks repeatable monthly
-        			if (repeatableMonthly.isSelected()) {
-        				int monthRepeatable = taskCreated.getStartTime().getMonth();
-        				for (int i = 1; i <= 12 - monthRepeatable; i++) {
-        					Task t = new Task(taskName.getText(), taskDescription.getText()); 
-        					Date startDate = taskCreated.getStartTime();
-        					startDate.setMonth(monthRepeatable + i);
-        					t.setStartTime(startDate); 
-        					Date endDate = taskCreated.getEndTime();
-        					endDate.setMonth(monthRepeatable + i);
-        					t.setEndTime(endDate); 	
-        					t.setAssignedTo(taskCreated.getAssignedTo());
-        					TaskDAO.insertTask(t, users); 
+        					// save tasks repeatable monthly
+        					if (repeatableMonthly.isSelected()) {
+        						int monthRepeatable = taskCreated.getStartTime().getMonth();
+        						for (int i = 1; i <= 12 - monthRepeatable; i++) {
+        							Task t = new Task(taskName.getText(), taskDescription.getText()); 
+        							Date startDate = taskCreated.getStartTime();
+        							startDate.setMonth(monthRepeatable + i);
+        							t.setStartTime(startDate); 
+        							Date endDate = taskCreated.getEndTime();
+        							endDate.setMonth(monthRepeatable + i);
+        							t.setEndTime(endDate); 	
+        							t.setAssignedTo(taskCreated.getAssignedTo());
+        							TaskDAO.insertTask(t, users); 
+        						}
+        					}
+        					cellTasks.removeAllElements();
+        				}
+        				if (result == JOptionPane.CANCEL_OPTION) {
+        					cellTasks.removeAllElements();
         				}
         			}
-        		cellTasks.removeAllElements();
-        		}
-        		if (result == JOptionPane.CANCEL_OPTION) {
-        			cellTasks.removeAllElements();
-        		}
+        			System.out.println("Selected: " + selectedData);
 			}
-        System.out.println("Selected: " + selectedData);
 		}
 	}};

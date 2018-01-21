@@ -20,6 +20,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -49,7 +51,7 @@ public class Planner extends JFrame {
 	Calendar cal = new GregorianCalendar(Locale.ENGLISH);
 	String month;
 	int year;
-	DefaultTableModel model;
+	DefaultTableModel modelCalendar;
 	JPanel listPanel = new JPanel();
 	JPanel topPanel = new JPanel();
 	JPanel buttonPanel = new JPanel();
@@ -74,7 +76,7 @@ public class Planner extends JFrame {
 	public Planner() {
 		super ("Planner. Learn IT, Girl!");
 		plannerFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		plannerFrame.setSize(800, 600);
+		plannerFrame.setSize(1000, 600);
 		plannerFrame.setLocation(300, 50);
 		plannerFrame.getContentPane().setBackground(Color.LIGHT_GRAY); 
 		plannerFrame.setVisible(true);
@@ -84,13 +86,11 @@ public class Planner extends JFrame {
 		for (User u : users) {
 			usersList.addElement(u);
 		}
-		System.out.println(users.toString());
 		
 		ArrayList<Task> tasks = TaskDAO.getTasks(users);
 		for (Task t : tasks) {
 			tasksList.addElement(t);
 		}
-		System.out.println(tasks.toString());
 		
 		// button for adding new users
 		AddNewUser newUser = new AddNewUser(usersList);
@@ -110,7 +110,10 @@ public class Planner extends JFrame {
 				tasksToday.addElement(t);
 			}
 		}	
-		System.out.println(tasksToday.toString());
+		
+		// alarm
+		Timer time = new Timer();
+		time.schedule(new AlarmTask(tasksToday), 0, TimeUnit.MINUTES.toMillis(1));
 		
 		// list with tomorrow's tasks
 		Calendar calTomorrow = Calendar.getInstance();
@@ -132,15 +135,15 @@ public class Planner extends JFrame {
 		listWithUsers.addListSelectionListener(listListenerU);
 		
 		// show a dialog for edit task, when we click on the today's task
-		ListTaskListener listListenerT = new ListTaskListener(usersList, tasksToday, listWithTasksToday, users);
+		ListTaskListener listListenerT = new ListTaskListener(usersList, tasksToday, listWithTasksToday, users, tasks, tasksList, modelCalendar);
 		listWithTasksToday.addListSelectionListener(listListenerT);
 		
 		// show a dialog for edit task, when we click on the tomorrow's task
-		ListTaskListener listListenerTomorrow = new ListTaskListener(usersList, tasksTomorrow, listWithTasksTomorrow, users);
+		ListTaskListener listListenerTomorrow = new ListTaskListener(usersList, tasksTomorrow, listWithTasksTomorrow, users, tasks, tasksList, modelCalendar);
 		listWithTasksTomorrow.addListSelectionListener(listListenerTomorrow);
 		
 		// show a dialog for edit task, when we click on the task (list with all the tasks)
-		ListTaskListener listListenerTask = new ListTaskListener(usersList, tasksList, listWithTasks, users);
+		ListTaskListener listListenerTask = new ListTaskListener(usersList, tasksList, listWithTasks, users, tasks, tasksList, modelCalendar);
 		listWithTasks.addListSelectionListener(listListenerTask);
 	
 		/*User's list
@@ -221,8 +224,8 @@ public class Planner extends JFrame {
 		// JTable for calendar
 		String[] columnNames = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 		
-		model = new DefaultTableModel(null, columnNames);
-		JTable calendar = new JTable(model);
+		modelCalendar = new DefaultTableModel(null, columnNames);
+		JTable calendar = new JTable(modelCalendar);
 	    monthLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
 		calendar.setRowHeight(80);
@@ -232,13 +235,13 @@ public class Planner extends JFrame {
 		calendar.setGridColor(Color.LIGHT_GRAY);
 		JScrollPane sp=new JScrollPane(calendar);
 		int rowCount = 5;
-		model.setRowCount(rowCount);
+		modelCalendar.setRowCount(rowCount);
 		
 		// cells renderer 
 		calendar.setDefaultRenderer(Object.class, new CellRenderer(tasks, cal));
 		
 		// cells listeners
-		CellListener cellListen = new CellListener(usersList, tasks, users, tasksList, calendar, cal);
+		CellListener cellListen = new CellListener(usersList, tasks, users, tasksList, tasksToday, tasksTomorrow, calendar, cal);
 		ListSelectionModel cellSelectionModel = calendar.getSelectionModel();
 	    cellSelectionModel.addListSelectionListener(cellListen);
 	    calendar.getColumnModel().getSelectionModel().addListSelectionListener(cellListen);
@@ -275,7 +278,6 @@ public class Planner extends JFrame {
 		this.updateMonth();
 		
 		// display today's date
-		System.out.println("Today is: " + today);
 		JTextField todayField = new JTextField(today.toString());
 		plannerFrame.add(todayField, BorderLayout.PAGE_END);
 	}
@@ -292,12 +294,12 @@ public class Planner extends JFrame {
 		int numberOfDays = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
 		int weeks = cal.getActualMaximum(Calendar.WEEK_OF_MONTH);
 		
-		model.setRowCount(0);
-		model.setRowCount(weeks);
+		modelCalendar.setRowCount(0);
+		modelCalendar.setRowCount(weeks);
 		
 		int i = startDay-1;
 		for(int day=1;day<=numberOfDays;day++){
-			model.setValueAt(day, i/7 , i%7 );    
+			modelCalendar.setValueAt(day, i/7 , i%7 );    
 			i = i + 1;
 		}
 	}     
