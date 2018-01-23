@@ -9,17 +9,18 @@ The planner offers the following functionalities:
 - 15 minutes, 10 minutes, “starting now” reminders for tasks.
 The planner will help you organize your time and your family's time.
 
-The instruction of database in Planner (for Windows):
+ Instructions on how to set up the database for the Planner (for Windows):
 - you need to download the MySQL Installer from: https://dev.mysql.com/downloads/installer/
-- you need to install MySQL Server, MySQL Connector/J and MySQL Workbench. During the instalation program can ask you to download additional packages.
+- you need to install MySQL Server, MySQL Connector/J and MySQL Workbench. During the installation, program can ask you to download additional packages.
 - do not forget to add the JAR archive named mysql-connector-java-version-bin.jar to the build path (COPY the JAR file "mysql-connector-java-5.1.{xx}-bin.jar" to your JDK's Extension Directory at "<JAVA_HOME>\jre\lib\ext" (where <JAVA_HOME> is the JDK installed directory), e.g., "c:\program files\java\jdk1.8.0_{xx}\jre\lib\ext"). 
 
 The database needs to have 2 tables: users and tasks. 
 To create the database and the tables, you need to use the queries:
-Database "planner":
+
+1. Database "planner":
 CREATE DATABASE planner;
 
-Table"users": 
+2. Table"users": 
 CREATE TABLE users (
     ID int NOT NULL AUTO_INCREMENT,
     firstName varchar(50) NOT NULL,
@@ -27,7 +28,7 @@ CREATE TABLE users (
 	PRIMARY KEY (ID)
 );
 
-Table "tasks":
+3. Table "tasks":
 CREATE TABLE tasks (
     taskID int NOT NULL AUTO_INCREMENT,
     nameTask varchar(50) NOT NULL,
@@ -39,3 +40,4 @@ CREATE TABLE tasks (
     FOREIGN KEY (assignedTo) REFERENCES users(ID)
 );
 
+And then you have to remember to edit the classes TaskDao and UserDao to add your own connection credentials needed to connect to the database.
