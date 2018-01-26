@@ -97,7 +97,7 @@ public class Planner extends JFrame {
 		addUserButton.addActionListener(newUser);
 		
 		// button for adding new task
-		AddNewTask newTask = new AddNewTask(usersList, tasks, users, tasksToday);
+		AddNewTask newTask = new AddNewTask(usersList, tasks, users, tasksToday, tasksList);
 		addTaskButton.addActionListener(newTask);
 		
 		// list with today's tasks
@@ -129,6 +129,9 @@ public class Planner extends JFrame {
 				tasksTomorrow.addElement(t);
 			}
 		}	
+		
+		String[] columnNames = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+		modelCalendar = new DefaultTableModel(null, columnNames);
 		
 		// show a dialog for edit user, when we click on the user
 		ListUserListener listListenerU = new ListUserListener(usersList, listWithUsers);
@@ -190,9 +193,7 @@ public class Planner extends JFrame {
 		plannerFrame.add(listPanel, BorderLayout.LINE_START); 
 		
 		// JTable for calendar
-		String[] columnNames = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 		
-		modelCalendar = new DefaultTableModel(null, columnNames);
 		JTable calendar = new JTable(modelCalendar);
 	    monthLabel.setHorizontalAlignment(SwingConstants.CENTER);
 

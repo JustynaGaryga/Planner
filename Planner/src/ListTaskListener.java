@@ -44,6 +44,7 @@ class ListTaskListener implements ListSelectionListener  {
 		this.tasks= tasks;
 		this.listAllTasks = listAllTasks;
 		this.modelCalendar = modelCalendar;
+		System.out.println("modelCalendar: " + modelCalendar);
 	}
 	
 	@Override		
@@ -318,6 +319,7 @@ class ListTaskListener implements ListSelectionListener  {
 				int i = tasksList.getIndexOf(editTask);
 				int j = tasks.indexOf(editTask);
 				int k = listAllTasks.getIndexOf(editTask);
+				System.out.println("value of k " + k);
 				boolean result = TaskDAO.deleteTask(editTask); 
 				if (result == true) {
 					tasksList.removeElementAt(i);
