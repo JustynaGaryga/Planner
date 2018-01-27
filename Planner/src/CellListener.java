@@ -286,6 +286,8 @@ public class CellListener implements ListSelectionListener {
         						cellTasks.addElement(taskCreated);
         						tasksToday.addElement(taskCreated);
         					}
+        					tasksList.addElement(taskCreated);
+        					
         					Date tomorrow = new Date();
         					Calendar calTomorrow = Calendar.getInstance();
         					calTomorrow.setTime(tomorrow);

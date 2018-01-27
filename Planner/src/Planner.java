@@ -97,7 +97,7 @@ public class Planner extends JFrame {
 		addUserButton.addActionListener(newUser);
 		
 		// button for adding new task
-		AddNewTask newTask = new AddNewTask(usersList, tasks, users, tasksToday);
+		AddNewTask newTask = new AddNewTask(usersList, tasks, users, tasksToday, tasksList);
 		addTaskButton.addActionListener(newTask);
 		
 		// list with today's tasks
@@ -130,6 +130,9 @@ public class Planner extends JFrame {
 			}
 		}	
 		
+		String[] columnNames = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+		modelCalendar = new DefaultTableModel(null, columnNames);
+		
 		// show a dialog for edit user, when we click on the user
 		ListUserListener listListenerU = new ListUserListener(usersList, listWithUsers);
 		listWithUsers.addListSelectionListener(listListenerU);
@@ -145,38 +148,6 @@ public class Planner extends JFrame {
 		// show a dialog for edit task, when we click on the task (list with all the tasks)
 		ListTaskListener listListenerTask = new ListTaskListener(usersList, tasksList, listWithTasks, users, tasks, tasksList, modelCalendar);
 		listWithTasks.addListSelectionListener(listListenerTask);
-	
-		/*User's list
-		User user1 = new User("Justyna", "Garyga");
-		User user2 = new User("Peter", "Garyga");
-		User user3 = new User("Chris", "Garyga");
-		User user4 = new User("Barbara", "Garyga");
-		
-		usersList.addElement(user1);
-		usersList.addElement(user2);
-		usersList.addElement(user3);
-		usersList.addElement(user4);
-		/*/ 
-	    // Users that want to use the application and don't have a database yet can use this code to have a working version
-		
-	    /* Task's list
-		Task task1 = new Task("Wash clothes", "washing clothes");
-		Task task2 = new Task("Shopping", "buying food and ");
-		Task task3 = new Task("Wash a car", "go to a car wash ");
-		Task task4 = new Task("Prepare breakfast", "at 6:00 AM");
-		Task task5 = new Task("Prepare dinner", "at 16: PM");
-		Task task6 = new Task("Visit my parents", "Majakowskiego Street");
-		Task task7 = new Task("Visit Piter's parents", "Panewnicka Street");
-	
-		tasksList.addElement(task1);
-		tasksList.addElement(task2);
-		tasksList.addElement(task3);
-		tasksList.addElement(task4);
-		tasksList.addElement(task5);
-		tasksList.addElement(task6);
-		tasksList.addElement(task7);
-		*/
-		// Tasks that want to use the application and don't have a database yet can use this code to have a working version
 
 		Border border = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
 		userLabel.setBorder(border); 
@@ -216,15 +187,13 @@ public class Planner extends JFrame {
 		
 		// the panel with buttons on the top
 		topPanel.setLayout(new BorderLayout());
-		topPanel.setBackground(Color.MAGENTA);
+		topPanel.setBackground(Color.DARK_GRAY);
 		topPanel.add(buttonPanel, BorderLayout.LINE_END);
 		plannerFrame.add(topPanel, BorderLayout.PAGE_START);
 		plannerFrame.add(listPanel, BorderLayout.LINE_START); 
 		
 		// JTable for calendar
-		String[] columnNames = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 		
-		modelCalendar = new DefaultTableModel(null, columnNames);
 		JTable calendar = new JTable(modelCalendar);
 	    monthLabel.setHorizontalAlignment(SwingConstants.CENTER);
 

@@ -21,12 +21,14 @@ public class AddNewTask implements ActionListener {
 	ArrayList<Task> tasks;
 	ArrayList<User> users;
 	DefaultComboBoxModel<Task> tasksToday;
+	DefaultComboBoxModel<Task> tasksList;
 	
-	public AddNewTask(DefaultComboBoxModel<User> usersList, ArrayList<Task> tasks, ArrayList<User> users, DefaultComboBoxModel<Task> tasksToday) {
+	public AddNewTask(DefaultComboBoxModel<User> usersList, ArrayList<Task> tasks, ArrayList<User> users, DefaultComboBoxModel<Task> tasksToday, DefaultComboBoxModel<Task> tasksList) {
 		this.usersList= usersList;
 		this.tasks= tasks;
 		this.users= users;
 		this.tasksToday= tasksToday;
+		this.tasksList= tasksList;
 	}
 	
 	// button for adding new task
@@ -243,6 +245,7 @@ public class AddNewTask implements ActionListener {
 		    	System.out.println("Today's task");
 	    		tasksToday.addElement(taskCreated);
 	    	}
+		    tasksList.addElement(taskCreated);
 			
 			// save tasks repeatable yearly
 			if (repeatableEachYear.isSelected()) {
